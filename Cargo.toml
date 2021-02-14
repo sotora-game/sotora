@@ -1,0 +1,21 @@
+[package]
+name = "sotora"
+version = "0.1.0"
+edition = "2018"
+
+[dependencies]
+
+[dependencies.bevy]
+git = "https://github.com/bevyengine/bevy.git"
+rev = "f8292ccf7ef99b254e936329de9dd7e079760e55"
+
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+
