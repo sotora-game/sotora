@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 
 mod overworld;
-use overworld::OverworldPlugin;
+use overworld::*;
 
 fn main() {
     App::build()
@@ -22,6 +22,8 @@ fn main() {
         })
         .insert_resource(ClearColor(Color::BLACK))
         .add_plugins(DefaultPlugins)
-        .add_plugin(OverworldPlugin)
+        .add_startup_system(setup_overworld.system())
+        .add_system(move_player.system())
+        .add_system(rotate_player.system())
         .run();
 }

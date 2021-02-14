@@ -4,10 +4,10 @@ use bevy::prelude::*;
 
 const PLAYER_SPEED: f32 = 10.;
 
-struct Camera;
-struct Player;
+pub struct Camera;
+pub struct Player;
 
-fn setup_overworld(
+pub fn setup_overworld(
     commands: &mut Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
@@ -40,7 +40,7 @@ fn setup_overworld(
         });
 }
 
-fn move_player(
+pub fn move_player(
     input: Res<Input<KeyCode>>,
     mut query: Query<&mut Transform, With<Player>>,
     time: Res<Time>,
@@ -64,7 +64,7 @@ fn move_player(
     }
 }
 
-fn rotate_player(
+pub fn rotate_player(
     mut query: Query<&mut Transform, With<Player>>,
     mut mouse_events: EventReader<MouseMotion>,
     window: Res<WindowDescriptor>,
@@ -74,14 +74,5 @@ fn rotate_player(
         for mut transform in query.iter_mut() {
             transform.rotate(rotation);
         }
-    }
-}
-
-pub struct OverworldPlugin;
-impl Plugin for OverworldPlugin {
-    fn build(&self, app: &mut AppBuilder) {
-        app.add_startup_system(setup_overworld.system())
-            .add_system(move_player.system())
-            .add_system(rotate_player.system());
     }
 }
