@@ -26,7 +26,7 @@ pub struct MenuAssets {
 impl FromResources for MenuAssets {
     fn from_resources(resources: &Resources) -> Self {
         let mut materials = resources.get_mut::<Assets<ColorMaterial>>().unwrap();
-        let mut assets = resources.get_mut::<AssetServer>().unwrap();
+        let assets = resources.get_mut::<AssetServer>().unwrap();
 
         MenuAssets {
             button_normal: materials.add(Color::rgb(0.3, 0.3, 0.36).into()),

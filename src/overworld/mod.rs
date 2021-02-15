@@ -18,8 +18,8 @@ pub fn setup_overworld(
 ) {
     light.color = Color::rgb(0.9, 0.9, 0.9);
 
-    let player_entity = spawn_player(commands, &mut meshes, &mut materials);
-    let camera_entity = spawn_camera(commands);
+    let _player_entity = spawn_player(commands, &mut meshes, &mut materials);
+    let _camera_entity = spawn_camera(commands);
 
     // FIXME re-enable this when https://github.com/bevyengine/bevy/issues/1452 is addressed so the camera despawns again
     //commands.push_children(player_entity, &[camera_entity]);
