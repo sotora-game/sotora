@@ -87,11 +87,57 @@ fn save_user_config<C: UserConfig>(data: &C) {
 }
 
 /// Gets the platform-specific user config directory
-fn get_config_file_path(file_name: &str) -> PathBuf {
+pub(self) fn get_config_file_path(file_name: &str) -> PathBuf {
     let dirs = ProjectDirs::from("", "bevy-community", "sotora")
         .expect("Could not access user config dirs");
 
     fs::create_dir_all(dirs.config_dir()).expect("Could not create user config directory");
 
     dirs.config_dir().join(format!("{}.ron", file_name))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde::{Deserialize, Serialize};
+    use std::io::Error;
+
+    #[derive(Debug, Serialize, Deserialize, Default, PartialEq, Eq)]
+    struct Foo {
+        value_a: bool,
+        value_b: String,
+        value_c: Bar,
+    }
+
+    #[derive(Debug, Serialize, Deserialize, Default, PartialEq, Eq)]
+    struct Bar(usize);
+
+    impl UserConfig for Foo {
+        const FILE_NAME: &'static str = "test";
+    }
+
+    #[test]
+    fn test() {
+        // Delete persisted file from last time, if necessary
+        if let Err(err) = std::fs::remove_file(get_config_file_path(Foo::FILE_NAME)) {
+            if err.kind() != ErrorKind::NotFound {
+                panic!("Could not remove file: {}", err);
+            }
+        }
+
+        // Make sure that loading a non-existent file returns the default values
+        let loaded_data = Foo::load();
+        assert_eq!(loaded_data, Foo::default());
+
+        // Make sure that saving and subsequently loading a config file returns the same data
+        let new_data = Foo {
+            value_a: true,
+            value_b: "Hello World".to_string(),
+            value_c: Bar(12),
+        };
+
+        new_data.save();
+        let reloaded_data = Foo::load();
+        assert_eq!(new_data, reloaded_data);
+    }
 }
