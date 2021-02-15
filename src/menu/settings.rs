@@ -31,10 +31,6 @@ pub fn setup(
     };
 
     commands
-        .spawn(UiCameraBundle::default())
-        // FIXME re-enable this when https://github.com/bevyengine/bevy/issues/1452 is addressed so the camera despawns again
-        //.with(StateCleanup)
-
         // Container
         .spawn(NodeBundle {
             style: Style {

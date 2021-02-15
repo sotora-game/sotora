@@ -44,6 +44,7 @@ fn main() {
         .insert_resource(ClearColor(Color::BLACK))
         .add_plugins(DefaultPlugins)
         .init_resource::<MenuAssets>()
+        .add_startup_system(global_setup.system())
         // AppState
         .insert_resource(State::new(AppState::MainMenu))
         .add_stage_before(stage::UPDATE, APPSTATES, StateStage::<AppState>::default())
@@ -62,4 +63,8 @@ fn main() {
         .on_state_update(APPSTATES, AppState::Overworld, overworld::back_to_menu.system())
         .on_state_exit(APPSTATES, AppState::Overworld, despawn_all::<overworld::StateCleanup>.system())
         .run();
+}
+
+fn global_setup(commands: &mut Commands) {
+    commands.spawn(UiCameraBundle::default());
 }
