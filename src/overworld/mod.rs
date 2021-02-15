@@ -1,14 +1,13 @@
-use bevy::input::mouse::MouseMotion;
 use bevy::pbr::AmbientLight;
 use bevy::prelude::*;
 
-const PLAYER_SPEED: f32 = 10.;
+use self::{camera::Camera, player::Player};
+
+pub mod camera;
+pub mod player;
 
 /// Marker for despawning when exiting `AppState::Overworld`
 pub struct StateCleanup;
-
-pub struct Camera;
-pub struct Player;
 
 pub fn setup_overworld(
     commands: &mut Commands,
@@ -18,6 +17,17 @@ pub fn setup_overworld(
 ) {
     light.color = Color::rgb(0.9, 0.9, 0.9);
 
+    let player_entity = spawn_player(commands, &mut meshes, &mut materials);
+    let camera_entity = spawn_camera(commands);
+
+    commands.push_children(player_entity, &[camera_entity]);
+}
+
+fn spawn_player(
+    commands: &mut Commands,
+    meshes: &mut Assets<Mesh>,
+    materials: &mut Assets<StandardMaterial>,
+) -> Entity {
     commands
         .spawn(PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Plane { size: 20.0 })),
@@ -32,52 +42,32 @@ pub fn setup_overworld(
             ..Default::default()
         })
         .with(StateCleanup)
-        .with(Player)
-        .with_children(|parent| {
-            let mut transform = Transform::from_translation(Vec3::new(0., 15., -15.));
-            transform.look_at(Vec3::zero(), Vec3::unit_y());
-            parent
-                .spawn(PerspectiveCameraBundle {
-                    transform,
-                    ..Default::default()
-                })
-                .with(Camera);
-        });
+        .with(Player { speed: 10. })
+        .current_entity()
+        .unwrap()
 }
 
-pub fn move_player(
-    input: Res<Input<KeyCode>>,
-    mut query: Query<&mut Transform, With<Player>>,
-    time: Res<Time>,
-) {
-    for mut transform in query.iter_mut() {
-        let forward = transform.forward();
-        let left = forward.cross(Vec3::unit_y());
-        let delta = time.delta_seconds() * PLAYER_SPEED;
-        if input.pressed(KeyCode::W) {
-            transform.translation += forward * delta;
-        }
-        if input.pressed(KeyCode::S) {
-            transform.translation -= forward * delta;
-        }
-        if input.pressed(KeyCode::A) {
-            transform.translation -= left * delta;
-        }
-        if input.pressed(KeyCode::D) {
-            transform.translation += left * delta;
-        }
-    }
-}
+fn spawn_camera(commands: &mut Commands) -> Entity {
+    let mut transform = Transform::from_translation(Vec3::new(0., 15., -15.));
+    transform.look_at(Vec3::zero(), Vec3::unit_y());
 
-pub fn rotate_player(
-    mut query: Query<&mut Transform, With<Player>>,
-    mut mouse_events: EventReader<MouseMotion>,
-    window: Res<WindowDescriptor>,
-) {
-    for event in mouse_events.iter() {
-        let rotation = Quat::from_rotation_y(-4. * event.delta.x / window.width);
-        for mut transform in query.iter_mut() {
-            transform.rotate(rotation);
-        }
-    }
+    let root = commands
+        .spawn(())
+        .with(Transform::default())
+        .with(GlobalTransform::default())
+        .with(Camera)
+        .current_entity()
+        .unwrap();
+
+    let camera = commands
+        .spawn(PerspectiveCameraBundle {
+            transform,
+            ..Default::default()
+        })
+        .current_entity()
+        .unwrap();
+    
+    commands.push_children(root, &[camera]);
+
+    root
 }
