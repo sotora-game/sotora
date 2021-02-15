@@ -44,8 +44,8 @@ fn main() {
         .add_stage_before(stage::UPDATE, APPSTATES, StateStage::<AppState>::default())
         // Overworld
         .on_state_enter(APPSTATES, AppState::Overworld, overworld::setup_overworld.system())
-        .on_state_update(APPSTATES, AppState::Overworld, overworld::move_player.system())
-        .on_state_update(APPSTATES, AppState::Overworld, overworld::rotate_player.system())
+        .on_state_update(APPSTATES, AppState::Overworld, overworld::player::move_player.system())
+        .on_state_update(APPSTATES, AppState::Overworld, overworld::camera::rotate_camera.system())
         .on_state_exit(APPSTATES, AppState::Overworld, despawn_all::<overworld::StateCleanup>.system())
         .run();
 }
