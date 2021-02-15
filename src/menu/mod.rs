@@ -18,9 +18,9 @@ pub struct MenuAssets {
     font_light: Handle<Font>,
     font_light_italic: Handle<Font>,
     font_regular: Handle<Font>,
-    font_regular_italic: Handle<Font>,
+    //font_regular_italic: Handle<Font>,
     font_bold: Handle<Font>,
-    font_bold_italic: Handle<Font>,
+    //font_bold_italic: Handle<Font>,
 }
 
 impl FromResources for MenuAssets {
@@ -40,9 +40,9 @@ impl FromResources for MenuAssets {
             font_light: assets.load("fonts/sansation/Sansation-Light.ttf"),
             font_light_italic: assets.load("fonts/sansation/Sansation-LightItalic.ttf"),
             font_regular: assets.load("fonts/sansation/Sansation-Regular.ttf"),
-            font_regular_italic: assets.load("fonts/sansation/Sansation-Italic.ttf"),
+            //font_regular_italic: assets.load("fonts/sansation/Sansation-Italic.ttf"),
             font_bold: assets.load("fonts/sansation/Sansation-Bold.ttf"),
-            font_bold_italic: assets.load("fonts/sansation/Sansation-BoldItalic.ttf"),
+            //font_bold_italic: assets.load("fonts/sansation/Sansation-BoldItalic.ttf"),
         }
     }
 }

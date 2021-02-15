@@ -1,13 +1,14 @@
-use std::fs::{File, OpenOptions};
-use std::io::{BufReader, BufWriter, Error, ErrorKind};
-use std::path::{Path, PathBuf};
-use std::{fs, io};
+use std::fs;
+use std::fs::OpenOptions;
+use std::io::{BufReader, BufWriter, ErrorKind};
+use std::path::PathBuf;
 
 use bevy::prelude::*;
 use directories::ProjectDirs;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 
+/// Configurable key bindings
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(default)]
 pub struct KeyBinds {
