@@ -1,10 +1,12 @@
+use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
 
 use crate::menu::MenuAssets;
-use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
+use crate::user_config::{KeyBinds, UserConfig};
 
 mod menu;
 mod overworld;
+mod user_config;
 
 /// Despawn all entities with given component
 ///
@@ -43,6 +45,7 @@ fn main() {
         })
         .insert_resource(ClearColor(Color::BLACK))
         .add_plugins(DefaultPlugins)
+        .insert_resource(KeyBinds::load())
         .init_resource::<MenuAssets>()
         .add_startup_system(global_setup.system())
         // AppState
