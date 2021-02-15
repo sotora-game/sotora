@@ -7,28 +7,19 @@ use crate::AppState;
 /// Marker for despawning when exiting `AppState::MainMenu`
 pub struct StateCleanup;
 
-pub fn button_exit_app(
-    In(clicked): In<bool>,
-    mut app_exit: ResMut<Events<AppExit>>,
-) {
+pub fn button_exit_app(In(clicked): In<bool>, mut app_exit: ResMut<Events<AppExit>>) {
     if clicked {
         app_exit.send(AppExit);
     }
 }
 
-pub fn button_enter_game(
-    In(clicked): In<bool>,
-    mut state: ResMut<State<AppState>>,
-) {
+pub fn button_enter_game(In(clicked): In<bool>, mut state: ResMut<State<AppState>>) {
     if clicked {
         state.set_next(AppState::Overworld).unwrap();
     }
 }
 
-pub fn button_open_settings_menu(
-    In(clicked): In<bool>,
-    mut state: ResMut<State<AppState>>,
-) {
+pub fn button_open_settings_menu(In(clicked): In<bool>, mut state: ResMut<State<AppState>>) {
     if clicked {
         state.set_next(AppState::SettingsMenu).unwrap();
     }

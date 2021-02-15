@@ -6,10 +6,7 @@ use crate::AppState;
 /// Marker for despawning when exiting `AppState::SettingsMenu`
 pub struct StateCleanup;
 
-pub fn button_exit_settings_menu(
-    In(clicked): In<bool>,
-    mut state: ResMut<State<AppState>>,
-) {
+pub fn button_exit_settings_menu(In(clicked): In<bool>, mut state: ResMut<State<AppState>>) {
     if clicked {
         state.set_next(AppState::MainMenu).unwrap();
     }
