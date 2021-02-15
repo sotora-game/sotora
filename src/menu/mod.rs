@@ -37,12 +37,12 @@ impl FromResources for MenuAssets {
 
             transparent: materials.add(Color::NONE.into()),
 
-            font_light: assets.load("fonts/sansation/sansation_light.ttf"),
-            font_light_italic: assets.load("fonts/sansation/sansation_light_italic.ttf"),
-            font_regular: assets.load("fonts/sansation/sansation_regular.ttf"),
-            font_regular_italic: assets.load("fonts/sansation/sansation_italic.ttf"),
-            font_bold: assets.load("fonts/sansation/sansation_bold.ttf"),
-            font_bold_italic: assets.load("fonts/sansation/sansation_bold_italic.ttf"),
+            font_light: assets.load("fonts/sansation/Sansation-Light.ttf"),
+            font_light_italic: assets.load("fonts/sansation/Sansation-LightItalic.ttf"),
+            font_regular: assets.load("fonts/sansation/Sansation-Regular.ttf"),
+            font_regular_italic: assets.load("fonts/sansation/Sansation-Italic.ttf"),
+            font_bold: assets.load("fonts/sansation/Sansation-Bold.ttf"),
+            font_bold_italic: assets.load("fonts/sansation/Sansation-BoldItalic.ttf"),
         }
     }
 }
