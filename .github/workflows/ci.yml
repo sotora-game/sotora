@@ -36,7 +36,7 @@ jobs:
                       ~/.cargo/git
                       target
                   ####### TO PURGE CACHE: increment this number ↓↓↓
-                  key: ${{ runner.os }}-${{ matrix.toolchain }}-V0-${{ hashFiles('**/Cargo.lock') }}
+                  key: ${{ runner.os }}-${{ matrix.toolchain }}-V1-${{ hashFiles('**/Cargo.lock') }}
 
             - name: Install alsa and udev (if Linux)
               run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
@@ -45,7 +45,7 @@ jobs:
             #- name: Build & run tests
             #  run: cargo test --workspace
             - name: Build
-              run: cargo build --workspace
+              run: cargo build --all-targets --all-features --workspace
               env:
                   CARGO_INCREMENTAL: 0
                   RUSTFLAGS: "-C debuginfo=0 -D warnings -A dead-code"
@@ -57,5 +57,5 @@ jobs:
             # type complexity must be ignored because we use huge templates for queries
             # -A clippy::manual-strip: strip_prefix support was added in 1.45. we want to support earlier rust versions
             - name: Clippy
-              run: cargo clippy --all-targets --all-features -- --no-deps -D warnings -A clippy::type_complexity -A clippy::manual-strip -A dead-code
+              run: cargo clippy --all-targets --all-features --workspace -- --no-deps -D warnings -A clippy::type_complexity -A clippy::manual-strip -A dead-code
               if: runner.os == 'linux' && matrix.toolchain == 'stable'
