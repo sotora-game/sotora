@@ -3,10 +3,27 @@ use bevy::prelude::*;
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 
 mod overworld;
-use overworld::*;
+
+/// Despawn all entities with given component
+///
+/// Useful for streamlined cleanup
+fn despawn_all<T: Component>(cmd: &mut Commands, q: Query<Entity, With<T>>) {
+    for e in q.iter() {
+        cmd.despawn_recursive(e);
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AppState {
+    Overworld,
+}
 
 fn main() {
+    /// Label for the AppState stage
+    const APPSTATES: &str = "AppStates";
+
     App::build()
+        // Bevy configurations
         .insert_resource(ReportExecutionOrderAmbiguities)
         .add_plugin(LogDiagnosticsPlugin::default())
         .add_plugin(FrameTimeDiagnosticsPlugin::default())
@@ -22,8 +39,13 @@ fn main() {
         })
         .insert_resource(ClearColor(Color::BLACK))
         .add_plugins(DefaultPlugins)
-        .add_startup_system(setup_overworld.system())
-        .add_system(move_player.system())
-        .add_system(rotate_player.system())
+        // AppState
+        .insert_resource(State::new(AppState::Overworld))
+        .add_stage_before(stage::UPDATE, APPSTATES, StateStage::<AppState>::default())
+        // Overworld
+        .on_state_enter(APPSTATES, AppState::Overworld, overworld::setup_overworld.system())
+        .on_state_update(APPSTATES, AppState::Overworld, overworld::move_player.system())
+        .on_state_update(APPSTATES, AppState::Overworld, overworld::rotate_player.system())
+        .on_state_exit(APPSTATES, AppState::Overworld, despawn_all::<overworld::StateCleanup>.system())
         .run();
 }

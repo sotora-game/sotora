@@ -4,6 +4,9 @@ use bevy::prelude::*;
 
 const PLAYER_SPEED: f32 = 10.;
 
+/// Marker for despawning when exiting `AppState::Overworld`
+pub struct StateCleanup;
+
 pub struct Camera;
 pub struct Player;
 
@@ -21,12 +24,14 @@ pub fn setup_overworld(
             material: materials.add(Color::rgb(0.1, 0.8, 0.2).into()),
             ..Default::default()
         })
+        .with(StateCleanup)
         .spawn(PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Box::new(1., 2., 1.))),
             material: materials.add(Color::WHITE.into()),
             transform: Transform::from_translation(Vec3::new(0., 1.0, 0.)),
             ..Default::default()
         })
+        .with(StateCleanup)
         .with(Player)
         .with_children(|parent| {
             let mut transform = Transform::from_translation(Vec3::new(0., 15., -15.));
