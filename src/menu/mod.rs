@@ -1,7 +1,4 @@
-use bevy::app::AppExit;
 use bevy::prelude::*;
-
-use crate::AppState;
 
 pub mod main_menu;
 pub mod settings;

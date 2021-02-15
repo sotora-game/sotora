@@ -73,7 +73,9 @@ fn main() {
         .on_state_update(
             APPSTATES,
             AppState::MainMenu,
-            menu::main_menu::button_open_settings_menu.system().after("buttons"),
+            menu::main_menu::button_open_settings_menu
+                .system()
+                .after("buttons"),
         )
         .on_state_exit(
             APPSTATES,
@@ -94,7 +96,9 @@ fn main() {
         .on_state_update(
             APPSTATES,
             AppState::SettingsMenu,
-            menu::settings::button_exit_settings_menu.system().after("buttons"),
+            menu::settings::button_exit_settings_menu
+                .system()
+                .after("buttons"),
         )
         .on_state_exit(
             APPSTATES,
