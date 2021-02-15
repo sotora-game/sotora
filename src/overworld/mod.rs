@@ -2,6 +2,7 @@ use bevy::pbr::AmbientLight;
 use bevy::prelude::*;
 
 use self::{camera::Camera, player::Player};
+use crate::AppState;
 
 pub mod camera;
 pub mod player;
@@ -20,7 +21,8 @@ pub fn setup_overworld(
     let player_entity = spawn_player(commands, &mut meshes, &mut materials);
     let camera_entity = spawn_camera(commands);
 
-    commands.push_children(player_entity, &[camera_entity]);
+    // FIXME re-enable this when https://github.com/bevyengine/bevy/issues/1452 is addressed so the camera despawns again
+    //commands.push_children(player_entity, &[camera_entity]);
 }
 
 fn spawn_player(
@@ -66,8 +68,14 @@ fn spawn_camera(commands: &mut Commands) -> Entity {
         })
         .current_entity()
         .unwrap();
-    
+
     commands.push_children(root, &[camera]);
 
     root
+}
+
+pub fn back_to_menu(mut state: ResMut<State<AppState>>, input: Res<Input<KeyCode>>) {
+    if input.just_pressed(KeyCode::Escape) {
+        state.set_next(AppState::MainMenu).unwrap();
+    }
 }
