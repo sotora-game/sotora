@@ -64,6 +64,7 @@ impl Plugin for MenuPlugin {
     }
 }
 
+#[allow(dead_code)]
 pub struct MenuAssets {
     button_normal: Handle<ColorMaterial>,
     button_hover: Handle<ColorMaterial>,
