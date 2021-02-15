@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
-use crate::AppState;
 use crate::menu::{ClickAction, MenuMaterials, StateCleanup};
+use crate::AppState;
 
 pub fn setup(
     commands: &mut Commands,
@@ -30,6 +30,7 @@ pub fn setup(
 
     commands
         .spawn(UiCameraBundle::default())
+        //.with(StateCleanup) // TODO re-enable this when bug is addressed
         // Container
         .spawn(NodeBundle {
             style: Style {
@@ -61,7 +62,7 @@ pub fn setup(
                 })
                 .spawn(TextBundle {
                     text: Text::with_section(
-                        "a bevy game",
+                        "a bevy community game",
                         TextStyle {
                             font: asset_server.load("fonts/sansation/sansation_light.ttf"),
                             font_size: 15.0,

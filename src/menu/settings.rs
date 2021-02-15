@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
-use crate::AppState;
 use crate::menu::{ClickAction, MenuMaterials, StateCleanup};
+use crate::AppState;
 
 pub fn setup(
     commands: &mut Commands,
@@ -30,6 +30,7 @@ pub fn setup(
 
     commands
         .spawn(UiCameraBundle::default())
+        //.with(StateCleanup) // TODO re-enable this when bug is addressed
         // Container
         .spawn(NodeBundle {
             style: Style {
@@ -65,36 +66,37 @@ pub fn setup(
                         text: Text::with_section(
                             "SETTINGS",
                             TextStyle {
-                                font: asset_server.load("fonts/sansation/sansation_regular.ttf"),
-                                font_size: 15.0,
+                                font: asset_server.load("fonts/sansation/sansation_bold.ttf"),
+                                font_size: 16.0,
                                 color: Color::rgb(0.9, 0.9, 0.95),
                             },
                             Default::default(),
                         ),
                         ..Default::default()
                     })
-                        // Spacer
-                        .spawn(NodeBundle {
-                            style: Style {
-                                size: Size::new(Val::Auto, Val::Px(16.0)),
-                                ..Default::default()
+                    // Spacer
+                    .spawn(NodeBundle {
+                        style: Style {
+                            size: Size::new(Val::Auto, Val::Px(16.0)),
+                            ..Default::default()
+                        },
+                        material: materials.transparent.clone(),
+                        ..Default::default()
+                    })
+                    // Settings menu content placeholder
+                    .spawn(TextBundle {
+                        text: Text::with_section(
+                            "coming soon",
+                            TextStyle {
+                                font: asset_server
+                                    .load("fonts/sansation/sansation_light_italic.ttf"),
+                                font_size: 15.0,
+                                color: Color::rgb(0.9, 0.9, 0.95),
                             },
-                            material: materials.transparent.clone(),
-                            ..Default::default()
-                        })
-                        // Settings menu content placeholder
-                        .spawn(TextBundle {
-                            text: Text::with_section(
-                                "coming soon",
-                                TextStyle {
-                                    font: asset_server.load("fonts/sansation/sansation_light_italic.ttf"),
-                                    font_size: 15.0,
-                                    color: Color::rgb(0.9, 0.9, 0.95),
-                                },
-                                Default::default(),
-                            ),
-                            ..Default::default()
-                        });
+                            Default::default(),
+                        ),
+                        ..Default::default()
+                    });
                 })
                 // Spacer
                 .spawn(NodeBundle {
