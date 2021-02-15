@@ -4,10 +4,14 @@ version = "0.1.0"
 edition = "2018"
 
 [dependencies]
+directories = "3.0"
+serde = { version = "1.0", features = ["derive"] }
+ron = "0.6"
 
 [dependencies.bevy]
 git = "https://github.com/bevyengine/bevy.git"
 rev = "f8292ccf7ef99b254e936329de9dd7e079760e55"
+features = ["serialize"]
 
 [profile.dev]
 opt-level = 1

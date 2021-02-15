@@ -2,10 +2,12 @@ use bevy::prelude::*;
 use menu::MenuPlugin;
 use overworld::OverworldPlugin;
 
+use crate::user_config::{KeyBinds, UserConfig};
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 
 mod menu;
 mod overworld;
+mod user_config;
 
 /// Label for the AppState stage
 const APPSTATES: &str = "AppStates";
@@ -44,6 +46,7 @@ fn main() {
         })
         .insert_resource(ClearColor(Color::BLACK))
         .add_plugins(DefaultPlugins)
+        .insert_resource(KeyBinds::load())
         .add_startup_system(global_setup.system())
         // AppState
         .insert_resource(State::new(AppState::MainMenu))
