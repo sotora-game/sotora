@@ -2,6 +2,7 @@ use bevy::pbr::AmbientLight;
 use bevy::prelude::*;
 
 use self::{camera::Camera, player::Player};
+use crate::AppState;
 
 pub mod camera;
 pub mod player;
@@ -70,4 +71,10 @@ fn spawn_camera(commands: &mut Commands) -> Entity {
     commands.push_children(root, &[camera]);
 
     root
+}
+
+pub fn back_to_menu(mut state: ResMut<State<AppState>>, input: Res<Input<KeyCode>>) {
+    if input.just_pressed(KeyCode::Escape) {
+        state.set_next(AppState::MainMenu).unwrap();
+    }
 }
