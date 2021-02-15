@@ -68,7 +68,7 @@ fn load_user_config<C: UserConfig>() -> C {
             serde_json::from_reader(reader).expect("Could not read config file")
         }
         Err(e) if e.kind() == ErrorKind::NotFound => Default::default(),
-        Err(e) => panic!(e),
+        Err(e) => panic!("{}", e),
     }
 }
 
