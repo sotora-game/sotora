@@ -37,6 +37,7 @@ jobs:
                       ~/.cargo/registry
                       ~/.cargo/git
                       target
+                  ####### TO PURGE CACHE: increment this number ↓↓↓
                   key: ${{ runner.os }}-${{ matrix.toolchain }}-V0-${{ hashFiles('**/Cargo.lock') }}
 
             - name: Install alsa and udev (if Linux)
