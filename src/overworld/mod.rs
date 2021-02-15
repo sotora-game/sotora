@@ -21,7 +21,8 @@ pub fn setup_overworld(
     let player_entity = spawn_player(commands, &mut meshes, &mut materials);
     let camera_entity = spawn_camera(commands);
 
-    commands.push_children(player_entity, &[camera_entity]);
+    // TODO re-enable this when https://github.com/bevyengine/bevy/issues/1452 is addressed
+    //commands.push_children(player_entity, &[camera_entity]);
 }
 
 fn spawn_player(
@@ -67,7 +68,7 @@ fn spawn_camera(commands: &mut Commands) -> Entity {
         })
         .current_entity()
         .unwrap();
-    
+
     commands.push_children(root, &[camera]);
 
     root

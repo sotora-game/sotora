@@ -30,7 +30,9 @@ pub fn setup(
 
     commands
         .spawn(UiCameraBundle::default())
-        //.with(StateCleanup) // TODO re-enable this when bug is addressed
+        // TODO re-enable this when https://github.com/bevyengine/bevy/issues/1452 is addressed
+        //.with(StateCleanup)
+
         // Container
         .spawn(NodeBundle {
             style: Style {
