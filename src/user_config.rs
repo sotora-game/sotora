@@ -87,7 +87,7 @@ fn save_user_config<C: UserConfig>(data: &C) {
 }
 
 /// Gets the platform-specific user config directory
-pub(self) fn get_config_file_path(file_name: &str) -> PathBuf {
+fn get_config_file_path(file_name: &str) -> PathBuf {
     let dirs = ProjectDirs::from("", "bevy-community", "sotora")
         .expect("Could not access user config dirs");
 
