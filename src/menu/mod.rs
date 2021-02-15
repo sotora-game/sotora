@@ -6,6 +6,19 @@ use crate::AppState;
 pub mod main_menu;
 pub mod settings;
 
+/// Every logical action for which we can have a UI button
+///
+/// Add as a component to the respective button.
+///
+/// Implement functionality in systems that receive these as events.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ButtonAction {
+    EnterGame,
+    ExitApp,
+    OpenSettingsMenu,
+    ExitSettingsMenu,
+}
+
 pub struct MenuAssets {
     button_normal: Handle<ColorMaterial>,
     button_hover: Handle<ColorMaterial>,
@@ -47,17 +60,11 @@ impl FromResources for MenuAssets {
     }
 }
 
-pub enum ClickAction {
-    ChangeState(AppState),
-    Exit,
-}
-
 pub fn button_interact(
-    mut state: ResMut<State<AppState>>,
-    mut app_exit: ResMut<Events<AppExit>>,
+    mut actions: ResMut<Events<ButtonAction>>,
     materials: Res<MenuAssets>,
     mut query: Query<
-        (&Interaction, &mut Handle<ColorMaterial>, &ClickAction),
+        (&Interaction, &mut Handle<ColorMaterial>, &ButtonAction),
         (Mutated<Interaction>, With<Button>),
     >,
 ) {
@@ -66,10 +73,7 @@ pub fn button_interact(
             Interaction::Clicked => {
                 *material = materials.button_active.clone();
 
-                match action {
-                    ClickAction::ChangeState(next) => state.set_next(*next).unwrap(),
-                    ClickAction::Exit => app_exit.send(AppExit),
-                }
+                actions.send(*action);
             }
             Interaction::Hovered => *material = materials.button_hover.clone(),
             Interaction::None => *material = materials.button_normal.clone(),

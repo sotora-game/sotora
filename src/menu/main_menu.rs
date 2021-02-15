@@ -1,10 +1,44 @@
+use bevy::app::AppExit;
 use bevy::prelude::*;
 
-use crate::menu::{ClickAction, MenuAssets};
+use crate::menu::{ButtonAction, MenuAssets};
 use crate::AppState;
 
 /// Marker for despawning when exiting `AppState::MainMenu`
 pub struct StateCleanup;
+
+pub fn button_exit_app(
+    mut actions: EventReader<ButtonAction>,
+    mut app_exit: ResMut<Events<AppExit>>,
+) {
+    for ev in actions.iter() {
+        if let ButtonAction::ExitApp = ev {
+            app_exit.send(AppExit);
+        }
+    }
+}
+
+pub fn button_enter_game(
+    mut actions: EventReader<ButtonAction>,
+    mut state: ResMut<State<AppState>>,
+) {
+    for ev in actions.iter() {
+        if let ButtonAction::EnterGame = ev {
+            state.set_next(AppState::Overworld).unwrap();
+        }
+    }
+}
+
+pub fn button_open_settings_menu(
+    mut actions: EventReader<ButtonAction>,
+    mut state: ResMut<State<AppState>>,
+) {
+    for ev in actions.iter() {
+        if let ButtonAction::OpenSettingsMenu = ev {
+            state.set_next(AppState::SettingsMenu).unwrap();
+        }
+    }
+}
 
 pub fn setup(commands: &mut Commands, assets: Res<MenuAssets>) {
     let button_style = Style {
@@ -98,7 +132,7 @@ pub fn setup(commands: &mut Commands, assets: Res<MenuAssets>) {
                             style: button_style.clone(),
                             ..Default::default()
                         })
-                        .with(ClickAction::ChangeState(AppState::Overworld))
+                        .with(ButtonAction::EnterGame)
                         .with_children(|button| {
                             button.spawn(TextBundle {
                                 text: Text::with_section(
@@ -124,7 +158,7 @@ pub fn setup(commands: &mut Commands, assets: Res<MenuAssets>) {
                             style: button_style.clone(),
                             ..Default::default()
                         })
-                        .with(ClickAction::ChangeState(AppState::SettingsMenu))
+                        .with(ButtonAction::OpenSettingsMenu)
                         .with_children(|button| {
                             button.spawn(TextBundle {
                                 text: Text::with_section(
@@ -141,7 +175,7 @@ pub fn setup(commands: &mut Commands, assets: Res<MenuAssets>) {
                             style: button_style.clone(),
                             ..Default::default()
                         })
-                        .with(ClickAction::Exit)
+                        .with(ButtonAction::ExitApp)
                         .with_children(|button| {
                             button.spawn(TextBundle {
                                 text: Text::with_section(

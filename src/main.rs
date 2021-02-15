@@ -44,6 +44,7 @@ fn main() {
         .insert_resource(ClearColor(Color::BLACK))
         .add_plugins(DefaultPlugins)
         .init_resource::<MenuAssets>()
+        .add_event::<menu::ButtonAction>()
         .add_startup_system(global_setup.system())
         // AppState
         .insert_resource(State::new(AppState::MainMenu))
@@ -57,7 +58,22 @@ fn main() {
         .on_state_update(
             APPSTATES,
             AppState::MainMenu,
-            menu::button_interact.system(),
+            menu::button_interact.system().label("buttons"),
+        )
+        .on_state_update(
+            APPSTATES,
+            AppState::MainMenu,
+            menu::main_menu::button_exit_app.system().after("buttons"),
+        )
+        .on_state_update(
+            APPSTATES,
+            AppState::MainMenu,
+            menu::main_menu::button_enter_game.system().after("buttons"),
+        )
+        .on_state_update(
+            APPSTATES,
+            AppState::MainMenu,
+            menu::main_menu::button_open_settings_menu.system().after("buttons"),
         )
         .on_state_exit(
             APPSTATES,
@@ -73,7 +89,12 @@ fn main() {
         .on_state_update(
             APPSTATES,
             AppState::SettingsMenu,
-            menu::button_interact.system(),
+            menu::button_interact.system().label("buttons"),
+        )
+        .on_state_update(
+            APPSTATES,
+            AppState::SettingsMenu,
+            menu::settings::button_exit_settings_menu.system().after("buttons"),
         )
         .on_state_exit(
             APPSTATES,
