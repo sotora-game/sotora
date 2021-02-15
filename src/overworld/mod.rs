@@ -1,4 +1,3 @@
-use bevy::pbr::AmbientLight;
 use bevy::prelude::*;
 
 use self::{camera::Camera, interactable::Interactable, player::Player};
@@ -41,13 +40,21 @@ fn setup_overworld(
     commands: &mut Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    mut light: ResMut<AmbientLight>,
 ) {
-    light.color = Color::rgb(0.9, 0.9, 0.9);
-
     let _player_entity = spawn_player(commands, &mut meshes, &mut materials);
     let _interactable_entity = spawn_interactable(commands, &mut meshes, &mut materials);
     let _camera_entity = spawn_camera(commands);
+
+    commands
+        .spawn(LightBundle {
+            transform: Transform::from_xyz(5.0, 10.0, 5.0),
+            light: Light {
+                color: Color::rgb(0.5, 0.5, 0.5),
+                ..Default::default()
+            },
+            ..Default::default()
+        })
+        .with(StateCleanup);
 
     // FIXME re-enable this when https://github.com/bevyengine/bevy/issues/1452 is addressed so the camera despawns again
     //commands.push_children(player_entity, &[camera_entity]);

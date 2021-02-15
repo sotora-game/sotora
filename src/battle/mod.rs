@@ -1,4 +1,3 @@
-use bevy::pbr::AmbientLight;
 use bevy::prelude::*;
 
 use crate::AppState;
@@ -30,36 +29,38 @@ impl Plugin for BattlePlugin {
 
 fn setup_battle(
     commands: &mut Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    mut light: ResMut<AmbientLight>,
+    mut asset_server: ResMut<AssetServer>,
 ) {
-    light.color = Color::rgb(0.9, 0.9, 0.9);
+    spawn_board(commands, &mut asset_server, &mut materials);
 
-    spawn_board(commands, &mut meshes, &mut materials);
+    commands
+        .spawn(LightBundle {
+            transform: Transform::from_xyz(5.0, 10.0, 5.0),
+            light: Light {
+                color: Color::rgb(0.5, 0.5, 0.5),
+                ..Default::default()
+            },
+            ..Default::default()
+        })
+        .with(StateCleanup);
 }
 
 fn spawn_board(
     commands: &mut Commands,
-    meshes: &mut Assets<Mesh>,
+    asset_server: &mut AssetServer,
     materials: &mut Assets<StandardMaterial>,
 ) {
-    // Magic number
-    let half_board_size = 7;
+    let mesh = asset_server.load("meshes/hex.gltf#Mesh0/Primitive0");
 
-    for i in -half_board_size..half_board_size {
-        for j in -half_board_size..half_board_size {
-            // TODO Change for hexagons
-            commands
-                .spawn(PbrBundle {
-                    mesh: meshes.add(Mesh::from(shape::Plane { size: 0.8 })),
-                    transform: Transform::from_translation(Vec3::new(i as f32, 0., j as f32)),
-                    material: materials.add(Color::WHITE.into()),
-                    ..Default::default()
-                })
-                .with(StateCleanup);
-        }
-    }
+    commands
+        .spawn(PbrBundle {
+            mesh,
+            transform: Transform::from_scale(Vec3::splat(0.8)), // More magic numbers
+            material: materials.add(Color::WHITE.into()),
+            ..Default::default()
+        })
+        .with(StateCleanup);
 }
 
 fn back_to_overworld(mut state: ResMut<State<AppState>>, input: Res<Input<KeyCode>>) {
