@@ -6,7 +6,7 @@ use crate::AppState;
 pub mod main_menu;
 pub mod settings;
 
-pub struct MenuMaterials {
+pub struct MenuAssets {
     button_normal: Handle<ColorMaterial>,
     button_hover: Handle<ColorMaterial>,
     button_active: Handle<ColorMaterial>,
@@ -14,12 +14,21 @@ pub struct MenuMaterials {
     menu_panel_background: Handle<ColorMaterial>,
 
     transparent: Handle<ColorMaterial>,
+
+    font_light: Handle<Font>,
+    font_light_italic: Handle<Font>,
+    font_regular: Handle<Font>,
+    font_regular_italic: Handle<Font>,
+    font_bold: Handle<Font>,
+    font_bold_italic: Handle<Font>,
 }
 
-impl FromResources for MenuMaterials {
+impl FromResources for MenuAssets {
     fn from_resources(resources: &Resources) -> Self {
         let mut materials = resources.get_mut::<Assets<ColorMaterial>>().unwrap();
-        MenuMaterials {
+        let mut assets = resources.get_mut::<AssetServer>().unwrap();
+
+        MenuAssets {
             button_normal: materials.add(Color::rgb(0.3, 0.3, 0.36).into()),
             button_hover: materials.add(Color::rgb(0.4, 0.4, 0.46).into()),
             button_active: materials.add(Color::rgb(0.24, 0.24, 0.32).into()),
@@ -27,6 +36,13 @@ impl FromResources for MenuMaterials {
             menu_panel_background: materials.add(Color::rgb(0.2, 0.2, 0.24).into()),
 
             transparent: materials.add(Color::NONE.into()),
+
+            font_light: assets.load("fonts/sansation/sansation_light.ttf"),
+            font_light_italic: assets.load("fonts/sansation/sansation_light_italic.ttf"),
+            font_regular: assets.load("fonts/sansation/sansation_regular.ttf"),
+            font_regular_italic: assets.load("fonts/sansation/sansation_italic.ttf"),
+            font_bold: assets.load("fonts/sansation/sansation_bold.ttf"),
+            font_bold_italic: assets.load("fonts/sansation/sansation_bold_italic.ttf"),
         }
     }
 }
@@ -39,7 +55,7 @@ pub enum ClickAction {
 pub fn button_interact(
     mut state: ResMut<State<AppState>>,
     mut app_exit: ResMut<Events<AppExit>>,
-    materials: Res<MenuMaterials>,
+    materials: Res<MenuAssets>,
     mut query: Query<
         (&Interaction, &mut Handle<ColorMaterial>, &ClickAction),
         (Mutated<Interaction>, With<Button>),

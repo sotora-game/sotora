@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::menu::{ClickAction, MenuMaterials};
+use crate::menu::{ClickAction, MenuAssets};
 use crate::AppState;
 
 /// Marker for despawning when exiting `AppState::SettingsMenu`
@@ -8,8 +8,7 @@ pub struct StateCleanup;
 
 pub fn setup(
     commands: &mut Commands,
-    asset_server: Res<AssetServer>,
-    materials: Res<MenuMaterials>,
+    assets: Res<MenuAssets>,
 ) {
     let button_style = Style {
         size: Size::new(Val::Auto, Val::Auto),
@@ -26,7 +25,7 @@ pub fn setup(
     };
 
     let button_text_style = TextStyle {
-        font: asset_server.load("fonts/sansation/sansation_light.ttf"),
+        font: assets.font_light.clone(),
         font_size: 18.0,
         color: Color::WHITE,
     };
@@ -46,7 +45,7 @@ pub fn setup(
                 align_items: AlignItems::Center,
                 ..Default::default()
             },
-            material: materials.transparent.clone(),
+            material: assets.transparent.clone(),
             ..Default::default()
         })
         .with(StateCleanup)
@@ -62,7 +61,7 @@ pub fn setup(
                         padding: Rect::all(Val::Px(8.0)),
                         ..Default::default()
                     },
-                    material: materials.menu_panel_background.clone(),
+                    material: assets.menu_panel_background.clone(),
                     ..Default::default()
                 })
                 .with_children(|menu| {
@@ -71,7 +70,7 @@ pub fn setup(
                         text: Text::with_section(
                             "SETTINGS",
                             TextStyle {
-                                font: asset_server.load("fonts/sansation/sansation_bold.ttf"),
+                                font: assets.font_bold.clone(),
                                 font_size: 16.0,
                                 color: Color::rgb(0.9, 0.9, 0.95),
                             },
@@ -85,7 +84,7 @@ pub fn setup(
                             size: Size::new(Val::Auto, Val::Px(16.0)),
                             ..Default::default()
                         },
-                        material: materials.transparent.clone(),
+                        material: assets.transparent.clone(),
                         ..Default::default()
                     })
                     // Settings menu content placeholder
@@ -93,8 +92,7 @@ pub fn setup(
                         text: Text::with_section(
                             "coming soon",
                             TextStyle {
-                                font: asset_server
-                                    .load("fonts/sansation/sansation_light_italic.ttf"),
+                                font: assets.font_light_italic.clone(),
                                 font_size: 15.0,
                                 color: Color::rgb(0.9, 0.9, 0.95),
                             },
@@ -109,7 +107,7 @@ pub fn setup(
                         size: Size::new(Val::Auto, Val::Px(8.0)),
                         ..Default::default()
                     },
-                    material: materials.transparent.clone(),
+                    material: assets.transparent.clone(),
                     ..Default::default()
                 })
                 // Button bar under settings panel
@@ -119,14 +117,14 @@ pub fn setup(
                         justify_content: JustifyContent::FlexEnd,
                         ..Default::default()
                     },
-                    material: materials.menu_panel_background.clone(),
+                    material: assets.menu_panel_background.clone(),
                     ..Default::default()
                 })
                 .with_children(|button_bar| {
                     button_bar
                         // Back button
                         .spawn(ButtonBundle {
-                            material: materials.button_normal.clone(),
+                            material: assets.button_normal.clone(),
                             style: button_style.clone(),
                             ..Default::default()
                         })

@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::menu::{ClickAction, MenuMaterials};
+use crate::menu::{ClickAction, MenuAssets};
 use crate::AppState;
 
 /// Marker for despawning when exiting `AppState::MainMenu`
@@ -8,8 +8,7 @@ pub struct StateCleanup;
 
 pub fn setup(
     commands: &mut Commands,
-    asset_server: Res<AssetServer>,
-    materials: Res<MenuMaterials>,
+    assets: Res<MenuAssets>,
 ) {
     let button_style = Style {
         size: Size::new(Val::Auto, Val::Auto),
@@ -26,7 +25,7 @@ pub fn setup(
     };
 
     let button_text_style = TextStyle {
-        font: asset_server.load("fonts/sansation/sansation_light.ttf"),
+        font: assets.font_light.clone(),
         font_size: 18.0,
         color: Color::WHITE,
     };
@@ -46,7 +45,7 @@ pub fn setup(
                 align_items: AlignItems::Center,
                 ..Default::default()
             },
-            material: materials.transparent.clone(),
+            material: assets.transparent.clone(),
             ..Default::default()
         })
         .with(StateCleanup)
@@ -57,7 +56,7 @@ pub fn setup(
                     text: Text::with_section(
                         "SOTORA",
                         TextStyle {
-                            font: asset_server.load("fonts/sansation/sansation_regular.ttf"),
+                            font: assets.font_regular.clone(),
                             font_size: 25.0,
                             color: Color::rgb(0.9, 0.9, 0.95),
                         },
@@ -69,7 +68,7 @@ pub fn setup(
                     text: Text::with_section(
                         "a bevy community game",
                         TextStyle {
-                            font: asset_server.load("fonts/sansation/sansation_light.ttf"),
+                            font: assets.font_light.clone(),
                             font_size: 15.0,
                             color: Color::rgb(0.7, 0.7, 0.75),
                         },
@@ -83,7 +82,7 @@ pub fn setup(
                         size: Size::new(Val::Auto, Val::Px(16.0)),
                         ..Default::default()
                     },
-                    material: materials.transparent.clone(),
+                    material: assets.transparent.clone(),
                     ..Default::default()
                 })
                 // Menu panel
@@ -95,14 +94,14 @@ pub fn setup(
                         align_items: AlignItems::Stretch,
                         ..Default::default()
                     },
-                    material: materials.menu_panel_background.clone(),
+                    material: assets.menu_panel_background.clone(),
                     ..Default::default()
                 })
                 .with_children(|menu| {
                     menu
                         // Play button
                         .spawn(ButtonBundle {
-                            material: materials.button_normal.clone(),
+                            material: assets.button_normal.clone(),
                             style: button_style.clone(),
                             ..Default::default()
                         })
@@ -123,12 +122,12 @@ pub fn setup(
                                 size: Size::new(Val::Auto, Val::Px(16.0)),
                                 ..Default::default()
                             },
-                            material: materials.transparent.clone(),
+                            material: assets.transparent.clone(),
                             ..Default::default()
                         })
                         // Settings button
                         .spawn(ButtonBundle {
-                            material: materials.button_normal.clone(),
+                            material: assets.button_normal.clone(),
                             style: button_style.clone(),
                             ..Default::default()
                         })
@@ -145,7 +144,7 @@ pub fn setup(
                         })
                         // Quit button
                         .spawn(ButtonBundle {
-                            material: materials.button_normal.clone(),
+                            material: assets.button_normal.clone(),
                             style: button_style.clone(),
                             ..Default::default()
                         })

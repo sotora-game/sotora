@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
-use crate::menu::MenuMaterials;
+use crate::menu::MenuAssets;
 
 mod overworld;
 mod menu;
@@ -43,7 +43,7 @@ fn main() {
         })
         .insert_resource(ClearColor(Color::BLACK))
         .add_plugins(DefaultPlugins)
-        .init_resource::<MenuMaterials>()
+        .init_resource::<MenuAssets>()
         // AppState
         .insert_resource(State::new(AppState::MainMenu))
         .add_stage_before(stage::UPDATE, APPSTATES, StateStage::<AppState>::default())
