@@ -6,10 +6,7 @@ use crate::AppState;
 /// Marker for despawning when exiting `AppState::SettingsMenu`
 pub struct StateCleanup;
 
-pub fn setup(
-    commands: &mut Commands,
-    assets: Res<MenuAssets>,
-) {
+pub fn setup(commands: &mut Commands, assets: Res<MenuAssets>) {
     let button_style = Style {
         size: Size::new(Val::Auto, Val::Auto),
         margin: Rect::all(Val::Px(5.0)),
