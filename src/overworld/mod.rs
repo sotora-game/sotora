@@ -2,7 +2,9 @@ use bevy::pbr::AmbientLight;
 use bevy::prelude::*;
 
 use self::{camera::Camera, player::Player};
+
 use crate::AppState;
+use crate::APPSTATES;
 
 pub mod camera;
 pub mod player;
@@ -10,7 +12,26 @@ pub mod player;
 /// Marker for despawning when exiting `AppState::Overworld`
 pub struct StateCleanup;
 
-pub fn setup_overworld(
+pub struct OverworldPlugin;
+impl Plugin for OverworldPlugin {
+    fn build(&self, app: &mut AppBuilder) {
+        app.on_state_enter(APPSTATES, AppState::Overworld, setup_overworld.system())
+            .on_state_update(APPSTATES, AppState::Overworld, player::move_player.system())
+            .on_state_update(
+                APPSTATES,
+                AppState::Overworld,
+                camera::rotate_camera.system(),
+            )
+            .on_state_update(APPSTATES, AppState::Overworld, back_to_menu.system())
+            .on_state_exit(
+                APPSTATES,
+                AppState::Overworld,
+                crate::despawn_all::<StateCleanup>.system(),
+            );
+    }
+}
+
+fn setup_overworld(
     commands: &mut Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
