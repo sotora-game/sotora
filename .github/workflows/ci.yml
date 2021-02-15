@@ -64,8 +64,8 @@ jobs:
       - name: Get Rust toolchain
       - uses: actions-rs/toolchain@v1
         with:
+          profile: minimal
           toolchain: ${{ matrix.toolchain }}
-          components: rustfmt, clippy
           override: true
 
       - name: Retrieve cache
