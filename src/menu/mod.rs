@@ -1,10 +1,17 @@
-use bevy::app::AppExit;
 use bevy::prelude::*;
-
-use crate::AppState;
 
 pub mod main_menu;
 pub mod settings;
+
+/// Every logical action for which we can have a UI button
+///
+/// Use as marker components to identify the buttons.
+pub mod button {
+    pub struct EnterGame;
+    pub struct ExitApp;
+    pub struct OpenSettingsMenu;
+    pub struct ExitSettingsMenu;
+}
 
 pub struct MenuAssets {
     button_normal: Handle<ColorMaterial>,
@@ -47,32 +54,25 @@ impl FromResources for MenuAssets {
     }
 }
 
-pub enum ClickAction {
-    ChangeState(AppState),
-    Exit,
-}
-
-pub fn button_interact(
-    mut state: ResMut<State<AppState>>,
-    mut app_exit: ResMut<Events<AppExit>>,
+pub fn button_interact<B: Component>(
     materials: Res<MenuAssets>,
     mut query: Query<
-        (&Interaction, &mut Handle<ColorMaterial>, &ClickAction),
-        (Mutated<Interaction>, With<Button>),
+        (&Interaction, &mut Handle<ColorMaterial>),
+        (Mutated<Interaction>, With<Button>, With<B>),
     >,
-) {
-    for (interaction, mut material, action) in query.iter_mut() {
+) -> bool {
+    let mut clicked = false;
+
+    for (interaction, mut material) in query.iter_mut() {
         match interaction {
             Interaction::Clicked => {
                 *material = materials.button_active.clone();
-
-                match action {
-                    ClickAction::ChangeState(next) => state.set_next(*next).unwrap(),
-                    ClickAction::Exit => app_exit.send(AppExit),
-                }
+                clicked = true;
             }
             Interaction::Hovered => *material = materials.button_hover.clone(),
             Interaction::None => *material = materials.button_normal.clone(),
         }
     }
+
+    clicked
 }
