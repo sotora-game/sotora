@@ -60,12 +60,12 @@ pub trait UserConfig: Serialize + DeserializeOwned + Default {
 fn load_user_config<C: UserConfig>() -> C {
     let file = OpenOptions::new()
         .read(true)
-        .open(get_user_config_dir().join(format!("{}.json", C::FILE_NAME)));
+        .open(get_config_file_path(C::FILE_NAME));
 
     match file {
         Ok(file) => {
             let reader = BufReader::new(file);
-            serde_json::from_reader(reader).expect("Could not read config file")
+            ron::de::from_reader(reader).expect("Could not read config file")
         }
         Err(e) if e.kind() == ErrorKind::NotFound => Default::default(),
         Err(e) => panic!("{}", e),
@@ -78,19 +78,20 @@ fn save_user_config<C: UserConfig>(data: &C) {
         .write(true)
         .create(true)
         .truncate(true)
-        .open(get_user_config_dir().join(format!("{}.json", C::FILE_NAME)))
+        .open(get_config_file_path(C::FILE_NAME))
         .expect("Could not open user config file for writing");
 
     let writer = BufWriter::new(file);
-    serde_json::to_writer_pretty(writer, data).expect("Could not write config file");
+    ron::ser::to_writer_pretty(writer, data, Default::default())
+        .expect("Could not write config file");
 }
 
 /// Gets the platform-specific user config directory
-fn get_user_config_dir() -> PathBuf {
+fn get_config_file_path(file_name: &str) -> PathBuf {
     let dirs = ProjectDirs::from("", "bevy-community", "sotora")
         .expect("Could not access user config dirs");
 
     fs::create_dir_all(dirs.config_dir()).expect("Could not create user config directory");
 
-    dirs.config_dir().to_owned()
+    dirs.config_dir().join(format!("{}.ron", file_name))
 }
