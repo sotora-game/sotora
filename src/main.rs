@@ -22,7 +22,6 @@ fn main() {
     /// Label for the AppState stage
     const APPSTATES: &str = "AppStates";
 
-    let n = 0;
     App::build()
         // Bevy configurations
         .insert_resource(ReportExecutionOrderAmbiguities)
