@@ -57,7 +57,23 @@ fn main() {
         .on_state_update(
             APPSTATES,
             AppState::MainMenu,
-            menu::button_interact.system(),
+            menu::button_interact::<menu::button::ExitApp>
+                .system()
+                .chain(menu::main_menu::button_exit_app.system()),
+        )
+        .on_state_update(
+            APPSTATES,
+            AppState::MainMenu,
+            menu::button_interact::<menu::button::EnterGame>
+                .system()
+                .chain(menu::main_menu::button_enter_game.system()),
+        )
+        .on_state_update(
+            APPSTATES,
+            AppState::MainMenu,
+            menu::button_interact::<menu::button::OpenSettingsMenu>
+                .system()
+                .chain(menu::main_menu::button_open_settings_menu.system()),
         )
         .on_state_exit(
             APPSTATES,
@@ -73,7 +89,9 @@ fn main() {
         .on_state_update(
             APPSTATES,
             AppState::SettingsMenu,
-            menu::button_interact.system(),
+            menu::button_interact::<menu::button::ExitSettingsMenu>
+                .system()
+                .chain(menu::settings::button_exit_settings_menu.system()),
         )
         .on_state_exit(
             APPSTATES,

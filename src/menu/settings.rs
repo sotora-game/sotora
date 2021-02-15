@@ -1,10 +1,16 @@
 use bevy::prelude::*;
 
-use crate::menu::{ClickAction, MenuAssets};
+use crate::menu::{button, MenuAssets};
 use crate::AppState;
 
 /// Marker for despawning when exiting `AppState::SettingsMenu`
 pub struct StateCleanup;
+
+pub fn button_exit_settings_menu(In(clicked): In<bool>, mut state: ResMut<State<AppState>>) {
+    if clicked {
+        state.set_next(AppState::MainMenu).unwrap();
+    }
+}
 
 pub fn setup(commands: &mut Commands, assets: Res<MenuAssets>) {
     let button_style = Style {
@@ -121,7 +127,7 @@ pub fn setup(commands: &mut Commands, assets: Res<MenuAssets>) {
                             style: button_style.clone(),
                             ..Default::default()
                         })
-                        .with(ClickAction::ChangeState(AppState::MainMenu))
+                        .with(button::ExitSettingsMenu)
                         .with_children(|button| {
                             button.spawn(TextBundle {
                                 text: Text::with_section(
