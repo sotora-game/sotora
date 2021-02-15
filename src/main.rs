@@ -50,11 +50,11 @@ fn main() {
         // Main menu
         .on_state_enter(APPSTATES, AppState::MainMenu, menu::main_menu::setup.system())
         .on_state_update(APPSTATES, AppState::MainMenu, menu::button_interact.system())
-        .on_state_exit(APPSTATES, AppState::MainMenu, despawn_all::<menu::StateCleanup>.system())
+        .on_state_exit(APPSTATES, AppState::MainMenu, despawn_all::<menu::main_menu::StateCleanup>.system())
         // Settings menu
         .on_state_enter(APPSTATES, AppState::SettingsMenu, menu::settings::setup.system())
         .on_state_update(APPSTATES, AppState::SettingsMenu, menu::button_interact.system())
-        .on_state_exit(APPSTATES, AppState::SettingsMenu, despawn_all::<menu::StateCleanup>.system())
+        .on_state_exit(APPSTATES, AppState::SettingsMenu, despawn_all::<menu::settings::StateCleanup>.system())
         // Overworld
         .on_state_enter(APPSTATES, AppState::Overworld, overworld::setup_overworld.system())
         .on_state_update(APPSTATES, AppState::Overworld, overworld::player::move_player.system())

@@ -6,9 +6,6 @@ use crate::AppState;
 pub mod main_menu;
 pub mod settings;
 
-/// Marker for despawning when exiting `AppState::MainMenu`
-pub struct StateCleanup;
-
 pub struct MenuMaterials {
     button_normal: Handle<ColorMaterial>,
     button_hover: Handle<ColorMaterial>,

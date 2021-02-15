@@ -1,7 +1,10 @@
 use bevy::prelude::*;
 
-use crate::menu::{ClickAction, MenuMaterials, StateCleanup};
+use crate::menu::{ClickAction, MenuMaterials};
 use crate::AppState;
+
+/// Marker for despawning when exiting `AppState::SettingsMenu`
+pub struct StateCleanup;
 
 pub fn setup(
     commands: &mut Commands,
