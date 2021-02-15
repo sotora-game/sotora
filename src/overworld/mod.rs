@@ -21,7 +21,7 @@ pub fn setup_overworld(
     let player_entity = spawn_player(commands, &mut meshes, &mut materials);
     let camera_entity = spawn_camera(commands);
 
-    // TODO re-enable this when https://github.com/bevyengine/bevy/issues/1452 is addressed
+    // FIXME re-enable this when https://github.com/bevyengine/bevy/issues/1452 is addressed so the camera despawns again
     //commands.push_children(player_entity, &[camera_entity]);
 }
 
