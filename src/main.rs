@@ -4,6 +4,7 @@ use overworld::OverworldPlugin;
 
 use crate::user_config::{KeyBinds, UserConfig};
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
+use bevy::render::camera::{ActiveCameras, Camera};
 
 mod menu;
 mod overworld;
@@ -22,8 +23,27 @@ pub enum AppState {
 /// Despawn all entities with given component
 ///
 /// Useful for streamlined cleanup
-fn despawn_all<T: Component>(cmd: &mut Commands, q: Query<Entity, With<T>>) {
-    for e in q.iter() {
+///
+/// ## Cameras
+/// Because of a bug in Bevy (see [#1452](https://github.com/bevyengine/bevy/issues/1452)),
+/// this system will mannually deactive all cameras with the given `T` component.
+///
+/// **Make sure to spawn all cameras that need to be despawned with the `T` cleanup marker
+/// component**, otherwise the game will panic when the camera despawns.
+fn despawn_all<T: Component>(
+    cmd: &mut Commands,
+    query: Query<Entity, With<T>>,
+    mut cameras: ResMut<ActiveCameras>,
+    camera_query: Query<&Camera, With<T>>,
+) {
+    // FIXME workaround for https://github.com/bevyengine/bevy/issues/1452
+    for camera in camera_query.iter() {
+        if let Some(name) = &camera.name {
+            cameras.cameras.insert(name.clone(), None);
+        }
+    }
+
+    for e in query.iter() {
         cmd.despawn_recursive(e);
     }
 }

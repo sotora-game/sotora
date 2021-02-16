@@ -13,6 +13,7 @@ pub mod player;
 pub struct StateCleanup;
 
 pub struct OverworldPlugin;
+
 impl Plugin for OverworldPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.on_state_enter(APPSTATES, AppState::Overworld, setup_overworld.system())
@@ -39,11 +40,10 @@ fn setup_overworld(
 ) {
     light.color = Color::rgb(0.9, 0.9, 0.9);
 
-    let _player_entity = spawn_player(commands, &mut meshes, &mut materials);
-    let _camera_entity = spawn_camera(commands);
+    let player_entity = spawn_player(commands, &mut meshes, &mut materials);
+    let camera_entity = spawn_camera(commands);
 
-    // FIXME re-enable this when https://github.com/bevyengine/bevy/issues/1452 is addressed so the camera despawns again
-    //commands.push_children(player_entity, &[camera_entity]);
+    commands.push_children(player_entity, &[camera_entity]);
 }
 
 fn spawn_player(
@@ -87,6 +87,7 @@ fn spawn_camera(commands: &mut Commands) -> Entity {
             transform,
             ..Default::default()
         })
+        .with(StateCleanup)
         .current_entity()
         .unwrap();
 
