@@ -47,7 +47,7 @@ jobs:
         run: cargo clippy --workspace --all-targets --all-features -- --no-deps -D warnings -A clippy::type_complexity -A clippy::manual-strip -A dead-code
 
   build:
-    name: Build
+    name: Build and test
     strategy:
       matrix:
         toolchain: [stable, beta]
@@ -59,10 +59,11 @@ jobs:
             toolchain: beta
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
       - name: Get Rust toolchain
-      - uses: actions-rs/toolchain@v1
+        uses: actions-rs/toolchain@v1
         with:
           profile: minimal
           toolchain: ${{ matrix.toolchain }}
@@ -84,6 +85,12 @@ jobs:
 
       - name: Build
         run: cargo build --workspace --all-targets --all-features
+        env:
+          CARGO_INCREMENTAL: 0
+          RUSTFLAGS: "-C debuginfo=0 -D warnings -A dead-code"
+
+      - name: Test
+        run: cargo test --workspace --all-targets --all-features
         env:
           CARGO_INCREMENTAL: 0
           RUSTFLAGS: "-C debuginfo=0 -D warnings -A dead-code"
