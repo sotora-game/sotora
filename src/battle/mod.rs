@@ -10,7 +10,7 @@ pub struct BattlePlugin;
 impl Plugin for BattlePlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.on_state_enter(APPSTATES, AppState::Battle, setup_battle.system())
-            // NOTE: Uses same camera as overworld
+            // TODO: Uses same camera as overworld
             // For now we want the same behavior, and it doesn't get despawned when leaving
             // overworld, so spawning a new one doesn't work
             .on_state_update(
