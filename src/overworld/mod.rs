@@ -1,4 +1,4 @@
-use bevy::{pbr::AmbientLight, prelude::*};
+use bevy::prelude::*;
 
 use self::{camera::Camera, interactable::Interactable, player::Player};
 
@@ -44,11 +44,11 @@ fn setup_overworld(
 ) {
     let player_entity = spawn_player(commands, &mut meshes, &mut materials);
     let camera_entity = spawn_camera(commands);
-    
+
     commands.push_children(player_entity, &[camera_entity]);
-    
+
     let _interactable_entity = spawn_interactable(commands, &mut meshes, &mut materials);
-    
+
     commands
         .spawn(LightBundle {
             transform: Transform::from_xyz(5.0, 10.0, 5.0),
