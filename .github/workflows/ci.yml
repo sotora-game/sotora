@@ -1,61 +1,96 @@
 name: CI
 
 on:
-    pull_request:
-        branches: [master]
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
 
 env:
-    CARGO_TERM_COLOR: always
+  CARGO_TERM_COLOR: always
 
 jobs:
-    build:
-        strategy:
-            matrix:
-                toolchain: [stable, nightly]
-                os: [windows-latest, ubuntu-latest, macos-latest]
-                exclude:
-                    - os: macos-latest
-                      toolchain: nightly
-                    - os: windows-latest
-                      toolchain: nightly
-        runs-on: ${{ matrix.os }}
-        steps:
-            - uses: actions/checkout@v2
+  rustfmt-clippy:
+    name: Formatting and Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
 
-            - uses: actions-rs/toolchain@v1
-              with:
-                  toolchain: ${{ matrix.toolchain }}
-                  components: rustfmt, clippy
-                  override: true
+      - name: Get Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+          components: rustfmt, clippy
 
-            - name: Cache target dir
-              uses: actions/cache@v2
-              with:
-                  path: |
-                      ~/.cargo/registry
-                      ~/.cargo/git
-                      target
-                  ####### TO PURGE CACHE: increment this number ↓↓↓
-                  key: ${{ runner.os }}-${{ matrix.toolchain }}-V0-${{ hashFiles('**/Cargo.lock') }}
+      - name: Retrieve cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          # TO PURGE CACHE: increment this ↓↓↓ number
+          key: Linux-stable-rustmft-clippy-V3-${{ hashFiles('**/Cargo.lock') }}
 
-            - name: Install alsa and udev (if Linux)
-              run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
-              if: runner.os == 'linux'
+      - name: Check formatting
+        if: always()
+        run: cargo fmt --all -- --check
 
-            #- name: Build & run tests
-            #  run: cargo test --workspace
-            - name: Build
-              run: cargo build --workspace
-              env:
-                  CARGO_INCREMENTAL: 0
-                  RUSTFLAGS: "-C debuginfo=0 -D warnings -A dead-code"
+      - name: Install alsa and udev
+        run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
 
-            - name: Check formatting
-              run: cargo fmt --all -- --check
-              if: runner.os == 'linux' && matrix.toolchain == 'stable'
+      - name: Clippy
+        if: always()
+        run: cargo clippy --workspace --all-targets --all-features -- --no-deps -D warnings -A clippy::type_complexity -A clippy::manual-strip -A dead-code
 
-            # type complexity must be ignored because we use huge templates for queries
-            # -A clippy::manual-strip: strip_prefix support was added in 1.45. we want to support earlier rust versions
-            - name: Clippy
-              run: cargo clippy --all-targets --all-features -- --no-deps -D warnings -A clippy::type_complexity -A clippy::manual-strip -A dead-code
-              if: runner.os == 'linux' && matrix.toolchain == 'stable'
+  build:
+    name: Build and test
+    strategy:
+      matrix:
+        toolchain: [stable, beta]
+        os: [windows-latest, ubuntu-latest, macos-latest]
+        exclude:
+          - os: macos-latest
+            toolchain: beta
+          - os: windows-latest
+            toolchain: beta
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Get Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.toolchain }}
+          override: true
+
+      - name: Retrieve cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          ####### TO PURGE CACHE: increment this number ↓↓↓
+          key: ${{ runner.os }}-${{ matrix.toolchain }}-V3-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Install alsa and udev (if Linux)
+        run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
+        if: runner.os == 'linux'
+
+      - name: Build
+        run: cargo build --workspace --all-targets --all-features
+        env:
+          CARGO_INCREMENTAL: 0
+          RUSTFLAGS: "-C debuginfo=0 -D warnings -A dead-code"
+
+      - name: Test
+        run: cargo test --workspace --all-targets --all-features
+        env:
+          CARGO_INCREMENTAL: 0
+          RUSTFLAGS: "-C debuginfo=0 -D warnings -A dead-code"
