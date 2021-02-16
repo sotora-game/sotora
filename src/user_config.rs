@@ -100,7 +100,6 @@ fn get_config_file_path(file_name: &str) -> PathBuf {
 mod tests {
     use super::*;
     use serde::{Deserialize, Serialize};
-    use std::io::Error;
 
     #[derive(Debug, Serialize, Deserialize, Default, PartialEq, Eq)]
     struct Foo {
