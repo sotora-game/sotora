@@ -1,12 +1,12 @@
-use bevy::pbr::AmbientLight;
 use bevy::prelude::*;
 
-use self::{camera::Camera, player::Player};
+use self::{camera::Camera, interactable::Interactable, player::Player};
 
 use crate::AppState;
 use crate::APPSTATES;
 
 pub mod camera;
+pub mod interactable;
 pub mod player;
 
 /// Marker for despawning when exiting `AppState::Overworld`
@@ -23,6 +23,11 @@ impl Plugin for OverworldPlugin {
                 AppState::Overworld,
                 camera::rotate_camera.system(),
             )
+            .on_state_update(
+                APPSTATES,
+                AppState::Overworld,
+                interactable::interact_with_interactables.system(),
+            )
             .on_state_update(APPSTATES, AppState::Overworld, back_to_menu.system())
             .on_state_exit(
                 APPSTATES,
@@ -36,14 +41,24 @@ fn setup_overworld(
     commands: &mut Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    mut light: ResMut<AmbientLight>,
 ) {
-    light.color = Color::rgb(0.9, 0.9, 0.9);
-
     let player_entity = spawn_player(commands, &mut meshes, &mut materials);
     let camera_entity = spawn_camera(commands);
 
     commands.push_children(player_entity, &[camera_entity]);
+
+    let _interactable_entity = spawn_interactable(commands, &mut meshes, &mut materials);
+
+    commands
+        .spawn(LightBundle {
+            transform: Transform::from_xyz(5.0, 10.0, 5.0),
+            light: Light {
+                color: Color::rgb(0.5, 0.5, 0.5),
+                ..Default::default()
+            },
+            ..Default::default()
+        })
+        .with(StateCleanup);
 }
 
 fn spawn_player(
@@ -94,6 +109,24 @@ fn spawn_camera(commands: &mut Commands) -> Entity {
     commands.push_children(root, &[camera]);
 
     root
+}
+
+fn spawn_interactable(
+    commands: &mut Commands,
+    meshes: &mut Assets<Mesh>,
+    materials: &mut Assets<StandardMaterial>,
+) -> Entity {
+    commands
+        .spawn(PbrBundle {
+            mesh: meshes.add(Mesh::from(shape::Box::new(1., 1., 1.))),
+            material: materials.add(Color::RED.into()),
+            transform: Transform::from_translation(Vec3::new(5., 1.0, 5.)),
+            ..Default::default()
+        })
+        .with(Interactable)
+        .with(StateCleanup)
+        .current_entity()
+        .unwrap()
 }
 
 pub fn back_to_menu(mut state: ResMut<State<AppState>>, input: Res<Input<KeyCode>>) {

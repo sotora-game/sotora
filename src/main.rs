@@ -1,3 +1,4 @@
+use battle::BattlePlugin;
 use bevy::prelude::*;
 use menu::MenuPlugin;
 use overworld::OverworldPlugin;
@@ -6,6 +7,7 @@ use crate::user_config::{KeyBinds, UserConfig};
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::render::camera::{ActiveCameras, Camera};
 
+mod battle;
 mod menu;
 mod overworld;
 mod user_config;
@@ -18,6 +20,7 @@ pub enum AppState {
     MainMenu,
     SettingsMenu,
     Overworld,
+    Battle,
 }
 
 /// Despawn all entities with given component
@@ -81,6 +84,7 @@ fn main() {
         // State Plugins
         .add_plugin(MenuPlugin)
         .add_plugin(OverworldPlugin)
+        .add_plugin(BattlePlugin)
         .run();
 }
 
