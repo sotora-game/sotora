@@ -1,11 +1,11 @@
-use battle::BattlePlugin;
+use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
+use bevy::render::camera::{ActiveCameras, Camera};
+
+use battle::BattlePlugin;
 use menu::MenuPlugin;
 use overworld::OverworldPlugin;
-
-use crate::user_config::{KeyBinds, UserConfig};
-use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
-use bevy::render::camera::{ActiveCameras, Camera};
+use user_config::{KeyBinds, UserConfig};
 
 mod battle;
 mod menu;
@@ -77,6 +77,7 @@ fn main() {
         .insert_resource(ClearColor(Color::BLACK))
         .add_plugins(DefaultPlugins)
         .insert_resource(KeyBinds::load())
+        .init_resource::<UiAssets>()
         .add_startup_system(global_setup.system())
         // AppState
         .insert_resource(State::new(AppState::MainMenu))
@@ -85,9 +86,51 @@ fn main() {
         .add_plugin(MenuPlugin)
         .add_plugin(OverworldPlugin)
         .add_plugin(BattlePlugin)
+        .add_plugin(DialogPlugin)
         .run();
 }
 
 fn global_setup(commands: &mut Commands) {
     commands.spawn(UiCameraBundle::default());
+}
+
+pub struct UiAssets {
+    button_normal: Handle<ColorMaterial>,
+    button_hover: Handle<ColorMaterial>,
+    button_active: Handle<ColorMaterial>,
+
+    menu_panel_background: Handle<ColorMaterial>,
+
+    transparent: Handle<ColorMaterial>,
+
+    font_light: Handle<Font>,
+    font_light_italic: Handle<Font>,
+    font_regular: Handle<Font>,
+    font_regular_italic: Handle<Font>,
+    font_bold: Handle<Font>,
+    font_bold_italic: Handle<Font>,
+}
+
+impl FromResources for UiAssets {
+    fn from_resources(resources: &Resources) -> Self {
+        let mut materials = resources.get_mut::<Assets<ColorMaterial>>().unwrap();
+        let assets = resources.get_mut::<AssetServer>().unwrap();
+
+        UiAssets {
+            button_normal: materials.add(Color::rgb(0.3, 0.3, 0.36).into()),
+            button_hover: materials.add(Color::rgb(0.4, 0.4, 0.46).into()),
+            button_active: materials.add(Color::rgb(0.24, 0.24, 0.32).into()),
+
+            menu_panel_background: materials.add(Color::rgb(0.2, 0.2, 0.24).into()),
+
+            transparent: materials.add(Color::NONE.into()),
+
+            font_light: assets.load("fonts/sansation/Sansation-Light.ttf"),
+            font_light_italic: assets.load("fonts/sansation/Sansation-LightItalic.ttf"),
+            font_regular: assets.load("fonts/sansation/Sansation-Regular.ttf"),
+            font_regular_italic: assets.load("fonts/sansation/Sansation-Italic.ttf"),
+            font_bold: assets.load("fonts/sansation/Sansation-Bold.ttf"),
+            font_bold_italic: assets.load("fonts/sansation/Sansation-BoldItalic.ttf"),
+        }
+    }
 }

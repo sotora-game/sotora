@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 
 use crate::AppState;
+use crate::UiAssets;
 use crate::APPSTATES;
 
 pub mod main_menu;
@@ -19,8 +20,7 @@ pub mod button {
 pub struct MenuPlugin;
 impl Plugin for MenuPlugin {
     fn build(&self, app: &mut AppBuilder) {
-        app.init_resource::<MenuAssets>()
-            .on_state_enter(APPSTATES, AppState::MainMenu, main_menu::setup.system())
+        app.on_state_enter(APPSTATES, AppState::MainMenu, main_menu::setup.system())
             .on_state_update(
                 APPSTATES,
                 AppState::MainMenu,
@@ -64,49 +64,8 @@ impl Plugin for MenuPlugin {
     }
 }
 
-pub struct MenuAssets {
-    button_normal: Handle<ColorMaterial>,
-    button_hover: Handle<ColorMaterial>,
-    button_active: Handle<ColorMaterial>,
-
-    menu_panel_background: Handle<ColorMaterial>,
-
-    transparent: Handle<ColorMaterial>,
-
-    font_light: Handle<Font>,
-    font_light_italic: Handle<Font>,
-    font_regular: Handle<Font>,
-    font_regular_italic: Handle<Font>,
-    font_bold: Handle<Font>,
-    font_bold_italic: Handle<Font>,
-}
-
-impl FromResources for MenuAssets {
-    fn from_resources(resources: &Resources) -> Self {
-        let mut materials = resources.get_mut::<Assets<ColorMaterial>>().unwrap();
-        let assets = resources.get_mut::<AssetServer>().unwrap();
-
-        MenuAssets {
-            button_normal: materials.add(Color::rgb(0.3, 0.3, 0.36).into()),
-            button_hover: materials.add(Color::rgb(0.4, 0.4, 0.46).into()),
-            button_active: materials.add(Color::rgb(0.24, 0.24, 0.32).into()),
-
-            menu_panel_background: materials.add(Color::rgb(0.2, 0.2, 0.24).into()),
-
-            transparent: materials.add(Color::NONE.into()),
-
-            font_light: assets.load("fonts/sansation/Sansation-Light.ttf"),
-            font_light_italic: assets.load("fonts/sansation/Sansation-LightItalic.ttf"),
-            font_regular: assets.load("fonts/sansation/Sansation-Regular.ttf"),
-            font_regular_italic: assets.load("fonts/sansation/Sansation-Italic.ttf"),
-            font_bold: assets.load("fonts/sansation/Sansation-Bold.ttf"),
-            font_bold_italic: assets.load("fonts/sansation/Sansation-BoldItalic.ttf"),
-        }
-    }
-}
-
 pub fn button_interact<B: Component>(
-    materials: Res<MenuAssets>,
+    materials: Res<UiAssets>,
     mut query: Query<
         (&Interaction, &mut Handle<ColorMaterial>),
         (Mutated<Interaction>, With<Button>, With<B>),
