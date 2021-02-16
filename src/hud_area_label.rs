@@ -14,6 +14,21 @@ const BORDER_WIDTH: f32 = 80.0;
 /// Height of the decorative border images
 const BORDER_HEIGHT: f32 = 10.0;
 
+/// Padding in pixels between the decorative border images and the text
+const TEXT_PADDING: f32 = 10.0;
+
+/// How large the title text should be
+const TITLE_FONT_SIZE: f32 = 14.0;
+
+/// Offset of the title in pixels from the top of the window
+const OFFSET_FROM_TOP: f32 = 40.0;
+
+/// How long a title should be visible, in seconds
+const TITLE_DISPLAY_TIME: f32 = 2.5;
+
+/// How long the show/hide animation should last, in seconds
+const TITLE_ANIMATION_TIME: f32 = 0.8;
+
 /// Loads the assets required for the HUD area label
 pub struct HudAreaLabelAssets {
     hud_area_border_frames: [Handle<ColorMaterial>; BORDER_ANIMATION_FRAMES],
@@ -59,7 +74,7 @@ impl Animation {
         Animation {
             opening: true,
             frame_index: 0,
-            timer: Timer::from_seconds(0.1, true),
+            timer: Timer::from_seconds(TITLE_ANIMATION_TIME / BORDER_ANIMATION_FRAMES as f32, true),
         }
     }
 
@@ -67,7 +82,7 @@ impl Animation {
         Animation {
             opening: false,
             frame_index: BORDER_ANIMATION_FRAMES - 1,
-            timer: Timer::from_seconds(0.1, true),
+            timer: Timer::from_seconds(TITLE_ANIMATION_TIME / BORDER_ANIMATION_FRAMES as f32, true),
         }
     }
 
@@ -111,7 +126,7 @@ impl HudAreaLabel {
     pub fn show_area_title<S: Into<String>>(&mut self, label: S) {
         self.new_label = Some(label.into().to_uppercase());
         self.animation = Some(Animation::new_opening());
-        self.hide_timer = Some(Timer::from_seconds(2.5, false));
+        self.hide_timer = Some(Timer::from_seconds(TITLE_DISPLAY_TIME, false));
     }
 }
 
@@ -170,7 +185,7 @@ pub fn setup_hud_area_label(commands: &mut Commands, assets: Res<HudAreaLabelAss
             style: Style {
                 position_type: PositionType::Absolute,
                 position: Rect {
-                    top: Val::Px(40.0),
+                    top: Val::Px(OFFSET_FROM_TOP),
                     left: Val::Px(0.0),
                     right: Val::Auto,
                     bottom: Val::Auto,
@@ -200,7 +215,12 @@ pub fn setup_hud_area_label(commands: &mut Commands, assets: Res<HudAreaLabelAss
             // Text container with padding
             .spawn(NodeBundle {
                 style: Style {
-                    padding: Rect::all(Val::Px(10.0)),
+                    padding: Rect {
+                        top: Val::Px(0.0),
+                        bottom: Val::Px(0.0),
+                        left: Val::Px(TEXT_PADDING),
+                        right: Val::Px(TEXT_PADDING),
+                    },
                     ..Default::default()
                 },
                 material: assets.transparent.clone(),
@@ -213,7 +233,7 @@ pub fn setup_hud_area_label(commands: &mut Commands, assets: Res<HudAreaLabelAss
                             "",
                             TextStyle {
                                 font: assets.font_bold.clone(),
-                                font_size: 14.0,
+                                font_size: TITLE_FONT_SIZE,
                                 color: Color::WHITE,
                             },
                             Default::default(),
