@@ -3,11 +3,13 @@ use bevy::prelude::*;
 use bevy::render::camera::{ActiveCameras, Camera};
 
 use battle::BattlePlugin;
+use dialog::DialogPlugin;
 use menu::MenuPlugin;
 use overworld::OverworldPlugin;
 use user_config::{KeyBinds, UserConfig};
 
 mod battle;
+mod dialog;
 mod menu;
 mod overworld;
 mod user_config;
@@ -21,6 +23,7 @@ pub enum AppState {
     SettingsMenu,
     Overworld,
     Battle,
+    Dialog,
 }
 
 /// Despawn all entities with given component
@@ -102,6 +105,8 @@ pub struct UiAssets {
     menu_panel_background: Handle<ColorMaterial>,
 
     transparent: Handle<ColorMaterial>,
+    white: Handle<ColorMaterial>,
+    black: Handle<ColorMaterial>,
 
     font_light: Handle<Font>,
     font_light_italic: Handle<Font>,
@@ -124,6 +129,8 @@ impl FromResources for UiAssets {
             menu_panel_background: materials.add(Color::rgb(0.2, 0.2, 0.24).into()),
 
             transparent: materials.add(Color::NONE.into()),
+            white: materials.add(Color::WHITE.into()),
+            black: materials.add(Color::BLACK.into()),
 
             font_light: assets.load("fonts/sansation/Sansation-Light.ttf"),
             font_light_italic: assets.load("fonts/sansation/Sansation-LightItalic.ttf"),

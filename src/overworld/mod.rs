@@ -52,15 +52,23 @@ impl Plugin for OverworldPlugin {
 
 fn setup_overworld(
     commands: &mut Commands,
+    asset_server: Res<AssetServer>,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
+    mut s_materials: ResMut<Assets<StandardMaterial>>,
+    mut c_materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    let player_entity = spawn_player(commands, &mut meshes, &mut materials);
+    let player_entity = spawn_player(commands, &mut meshes, &mut s_materials);
     let camera_entity = spawn_camera(commands);
 
     commands.push_children(player_entity, &[camera_entity]);
 
-    spawn_interactables(commands, &mut meshes, &mut materials);
+    spawn_interactables(
+        commands,
+        &asset_server,
+        &mut meshes,
+        &mut s_materials,
+        &mut c_materials,
+    );
 
     commands
         .spawn(LightBundle {
@@ -126,28 +134,32 @@ fn spawn_camera(commands: &mut Commands) -> Entity {
 
 fn spawn_interactables(
     commands: &mut Commands,
+    asset_server: &AssetServer,
     meshes: &mut Assets<Mesh>,
-    materials: &mut Assets<StandardMaterial>,
+    s_materials: &mut Assets<StandardMaterial>,
+    c_materials: &mut Assets<ColorMaterial>,
 ) {
     commands
         .spawn(PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Box::new(1., 1., 1.))),
-            material: materials.add(Color::GREEN.into()),
+            material: s_materials.add(Color::GREEN.into()),
             transform: Transform::from_translation(Vec3::new(5., 1.0, 5.)),
             ..Default::default()
         })
         .with(BattleStarter)
         .with(StateCleanup);
 
+    let ferris_handle = asset_server.load("sprites/ferris-happy.png");
     commands
         .spawn(PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Box::new(1., 2., 1.))),
-            material: materials.add(Color::RED.into()),
+            material: s_materials.add(Color::RED.into()),
             transform: Transform::from_translation(Vec3::new(-5., 1.0, 5.)),
             ..Default::default()
         })
         .with(DialogStarter {
             npc_name: "Ferris".to_string(),
+            sprite: c_materials.add(ferris_handle.into()),
         })
         .with(StateCleanup);
 }
