@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
     branches: [master]
 
@@ -11,7 +11,7 @@ env:
 
 jobs:
   rustfmt-clippy:
-    name: Clippy and formatting
+    name: Formatting and Clippy
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -33,7 +33,11 @@ jobs:
             ~/.cargo/git
             target
           # TO PURGE CACHE: increment this ↓↓↓ number
-          key: Linux-stable-rustmft-clippy-V2-${{ hashFiles('**/Cargo.lock') }}
+          key: Linux-stable-rustmft-clippy-V3-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Check formatting
+        if: always()
+        run: cargo fmt --all -- --check
 
       - name: Install alsa and udev
         run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
@@ -42,21 +46,17 @@ jobs:
         if: always()
         run: cargo clippy --workspace --all-targets --all-features -- --no-deps -D warnings -A clippy::type_complexity -A clippy::manual-strip -A dead-code
 
-      - name: Check formatting
-        if: always()
-        run: cargo fmt --all -- --check
-
   build:
     name: Build
     strategy:
       matrix:
-        toolchain: [stable, nightly]
+        toolchain: [stable, beta]
         os: [windows-latest, ubuntu-latest, macos-latest]
         exclude:
           - os: macos-latest
-            toolchain: nightly
+            toolchain: beta
           - os: windows-latest
-            toolchain: nightly
+            toolchain: beta
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
@@ -76,7 +76,7 @@ jobs:
             ~/.cargo/git
             target
           ####### TO PURGE CACHE: increment this number ↓↓↓
-          key: ${{ runner.os }}-${{ matrix.toolchain }}-V2-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-${{ matrix.toolchain }}-V3-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Install alsa and udev (if Linux)
         run: sudo apt-get update; sudo apt-get install --no-install-recommends libasound2-dev libudev-dev
