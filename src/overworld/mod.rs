@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{pbr::AmbientLight, prelude::*};
 
 use self::{camera::Camera, interactable::Interactable, player::Player};
 
@@ -42,8 +42,6 @@ fn setup_overworld(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    light.color = Color::rgb(0.9, 0.9, 0.9);
-
     let player_entity = spawn_player(commands, &mut meshes, &mut materials);
     let camera_entity = spawn_camera(commands);
     
