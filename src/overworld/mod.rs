@@ -1,12 +1,16 @@
 use bevy::prelude::*;
 
-use self::{camera::Camera, interactable::Interactable, player::Player};
+use self::{
+    camera::Camera,
+    interactables::{battle_starter::BattleStarter, dialog_starter::DialogStarter},
+    player::Player,
+};
 
 use crate::AppState;
 use crate::APPSTATES;
 
 pub mod camera;
-pub mod interactable;
+pub mod interactables;
 pub mod player;
 
 /// Marker for despawning when exiting `AppState::Overworld`
@@ -26,7 +30,16 @@ impl Plugin for OverworldPlugin {
             .on_state_update(
                 APPSTATES,
                 AppState::Overworld,
-                interactable::interact_with_interactables.system(),
+                interactables::interactable_interact::<BattleStarter>
+                    .system()
+                    .chain(interactables::battle_starter::interactable_start_battle.system()),
+            )
+            .on_state_update(
+                APPSTATES,
+                AppState::Overworld,
+                interactables::interactable_interact::<DialogStarter>
+                    .system()
+                    .chain(interactables::dialog_starter::interactable_start_dialog.system()),
             )
             .on_state_update(APPSTATES, AppState::Overworld, back_to_menu.system())
             .on_state_exit(
@@ -47,7 +60,7 @@ fn setup_overworld(
 
     commands.push_children(player_entity, &[camera_entity]);
 
-    let _interactable_entity = spawn_interactable(commands, &mut meshes, &mut materials);
+    spawn_interactables(commands, &mut meshes, &mut materials);
 
     commands
         .spawn(LightBundle {
@@ -111,22 +124,32 @@ fn spawn_camera(commands: &mut Commands) -> Entity {
     root
 }
 
-fn spawn_interactable(
+fn spawn_interactables(
     commands: &mut Commands,
     meshes: &mut Assets<Mesh>,
     materials: &mut Assets<StandardMaterial>,
-) -> Entity {
+) {
     commands
         .spawn(PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Box::new(1., 1., 1.))),
-            material: materials.add(Color::RED.into()),
+            material: materials.add(Color::GREEN.into()),
             transform: Transform::from_translation(Vec3::new(5., 1.0, 5.)),
             ..Default::default()
         })
-        .with(Interactable)
-        .with(StateCleanup)
-        .current_entity()
-        .unwrap()
+        .with(BattleStarter)
+        .with(StateCleanup);
+
+    commands
+        .spawn(PbrBundle {
+            mesh: meshes.add(Mesh::from(shape::Box::new(1., 2., 1.))),
+            material: materials.add(Color::RED.into()),
+            transform: Transform::from_translation(Vec3::new(-5., 1.0, 5.)),
+            ..Default::default()
+        })
+        .with(DialogStarter {
+            npc_name: "Ferris".to_string(),
+        })
+        .with(StateCleanup);
 }
 
 pub fn back_to_menu(mut state: ResMut<State<AppState>>, input: Res<Input<KeyCode>>) {

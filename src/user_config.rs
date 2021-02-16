@@ -16,6 +16,8 @@ pub struct KeyBinds {
     pub move_left: KeyCode,
     pub move_backward: KeyCode,
     pub move_right: KeyCode,
+
+    pub interact: KeyCode,
 }
 
 impl Default for KeyBinds {
@@ -25,6 +27,8 @@ impl Default for KeyBinds {
             move_left: KeyCode::A,
             move_backward: KeyCode::S,
             move_right: KeyCode::D,
+
+            interact: KeyCode::E,
         }
     }
 }
