@@ -21,7 +21,7 @@ pub fn interactable_interact<B: Component + Clone>(
         for (i_transform, interactable) in interactables.iter() {
             let distance = p_transform.translation - i_transform.translation;
 
-            if distance.length() < 1.0 {
+            if distance.length() < 2.0 {
                 return Some(interactable.clone());
             }
         }
