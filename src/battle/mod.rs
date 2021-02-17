@@ -2,6 +2,7 @@ use bevy::prelude::*;
 
 use self::camera::Camera;
 
+use crate::hud_area_label::HudAreaLabel;
 use crate::AppState;
 use crate::APPSTATES;
 
@@ -14,6 +15,7 @@ pub struct BattlePlugin;
 impl Plugin for BattlePlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.on_state_enter(APPSTATES, AppState::Battle, setup_battle.system())
+            .on_state_enter(APPSTATES, AppState::Battle, show_area_title.system())
             .on_state_update(APPSTATES, AppState::Battle, camera::rotate_camera.system())
             .on_state_update(APPSTATES, AppState::Battle, back_to_overworld.system())
             .on_state_exit(
@@ -85,6 +87,10 @@ fn spawn_camera(commands: &mut Commands) -> Entity {
     commands.push_children(root, &[camera]);
 
     root
+}
+
+fn show_area_title(mut hud: ResMut<HudAreaLabel>) {
+    hud.show_area_title("The battle of Bevytown");
 }
 
 fn back_to_overworld(mut state: ResMut<State<AppState>>, input: Res<Input<KeyCode>>) {

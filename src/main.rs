@@ -6,10 +6,15 @@ use battle::BattlePlugin;
 use dialog::DialogPlugin;
 use menu::MenuPlugin;
 use overworld::OverworldPlugin;
-use user_config::{KeyBinds, UserConfig};
+
+use crate::hud_area_label::{
+    setup_hud_area_label, update_hud_area_label, HudAreaLabel, HudAreaLabelAssets,
+};
+use crate::user_config::{KeyBinds, UserConfig};
 
 mod battle;
 mod dialog;
+mod hud_area_label;
 mod menu;
 mod overworld;
 mod user_config;
@@ -82,6 +87,11 @@ fn main() {
         .insert_resource(KeyBinds::load())
         .init_resource::<UiAssets>()
         .add_startup_system(global_setup.system())
+        // HUD area label
+        .init_resource::<HudAreaLabelAssets>()
+        .init_resource::<HudAreaLabel>()
+        .add_startup_system(setup_hud_area_label.system())
+        .add_system(update_hud_area_label.system())
         // AppState
         .insert_resource(State::new(AppState::MainMenu))
         .add_stage_before(stage::UPDATE, APPSTATES, StateStage::<AppState>::default())
