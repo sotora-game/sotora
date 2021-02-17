@@ -6,6 +6,7 @@ use self::{
     player::Player,
 };
 
+use crate::hud_area_label::HudAreaLabel;
 use crate::AppState;
 use crate::APPSTATES;
 
@@ -21,6 +22,7 @@ pub struct OverworldPlugin;
 impl Plugin for OverworldPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.on_state_enter(APPSTATES, AppState::Overworld, setup_overworld.system())
+            .on_state_enter(APPSTATES, AppState::Overworld, show_area_title.system())
             .on_state_update(APPSTATES, AppState::Overworld, player::move_player.system())
             .on_state_update(
                 APPSTATES,
@@ -150,6 +152,10 @@ fn spawn_interactables(
             npc_name: "Ferris".to_string(),
         })
         .with(StateCleanup);
+}
+
+fn show_area_title(mut hud: ResMut<HudAreaLabel>) {
+    hud.show_area_title("Overworld");
 }
 
 pub fn back_to_menu(mut state: ResMut<State<AppState>>, input: Res<Input<KeyCode>>) {
