@@ -1,9 +1,10 @@
 use bevy::{input::mouse::MouseMotion, prelude::*};
 
-pub struct Camera;
+pub struct CameraRoot;
+pub struct CameraObject;
 
 pub fn rotate_camera(
-    mut query: Query<&mut Transform, With<Camera>>,
+    mut query: Query<&mut Transform, With<CameraRoot>>,
     mut mouse_events: EventReader<MouseMotion>,
     window: Res<WindowDescriptor>,
 ) {

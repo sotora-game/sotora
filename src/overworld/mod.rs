@@ -1,8 +1,9 @@
 use bevy::prelude::*;
 
 use self::{
-    camera::Camera,
+    camera::{CameraObject, CameraRoot},
     interactables::{battle_starter::BattleStarter, dialog_starter::DialogStarter},
+    name_tags::NameTag,
     player::Player,
 };
 
@@ -12,6 +13,7 @@ use crate::APPSTATES;
 
 pub mod camera;
 pub mod interactables;
+pub mod name_tags;
 pub mod player;
 
 /// Marker for despawning when exiting `AppState::Overworld`
@@ -42,6 +44,16 @@ impl Plugin for OverworldPlugin {
                 interactables::interactable_interact::<DialogStarter>
                     .system()
                     .chain(interactables::dialog_starter::interactable_start_dialog.system()),
+            )
+            .on_state_update(
+                APPSTATES,
+                AppState::Overworld,
+                name_tags::spawn_name_tag_sprite.system(),
+            )
+            .on_state_update(
+                APPSTATES,
+                AppState::Overworld,
+                name_tags::move_name_tag_and_rotate.system(),
             )
             .on_state_update(APPSTATES, AppState::Overworld, back_to_menu.system())
             .on_state_exit(
@@ -116,7 +128,7 @@ fn spawn_camera(commands: &mut Commands) -> Entity {
         .spawn(())
         .with(Transform::default())
         .with(GlobalTransform::default())
-        .with(Camera)
+        .with(CameraRoot)
         .current_entity()
         .unwrap();
 
@@ -125,6 +137,7 @@ fn spawn_camera(commands: &mut Commands) -> Entity {
             transform,
             ..Default::default()
         })
+        .with(CameraObject)
         .with(StateCleanup)
         .current_entity()
         .unwrap();
@@ -149,6 +162,7 @@ fn spawn_interactables(
             ..Default::default()
         })
         .with(BattleStarter)
+        .with(NameTag("Battle".to_string()))
         .with(StateCleanup);
 
     let ferris_handle = asset_server.load("sprites/ferris-happy.png");
@@ -159,6 +173,7 @@ fn spawn_interactables(
             transform: Transform::from_translation(Vec3::new(-5., 1.0, 5.)),
             ..Default::default()
         })
+        .with(NameTag("Ferris".to_string()))
         .with(DialogStarter {
             npc_name: "Ferris".to_string(),
             sprite: c_materials.add(ferris_handle.into()),
