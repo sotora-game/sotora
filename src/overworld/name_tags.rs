@@ -3,7 +3,20 @@ use crate::overworld::StateCleanup;
 use crate::UiAssets;
 use bevy::prelude::*;
 
-pub struct NameTag(pub String);
+pub struct NameTag {
+    /// Text for the name tag
+    name: String,
+    /// How high above the entity it should sit
+    margin: f32,
+}
+impl NameTag {
+    pub fn new(name: String) -> Self {
+        Self { name, margin: 1. }
+    }
+    pub fn new_with_margin(name: String, margin: f32) -> Self {
+        Self { name, margin }
+    }
+}
 
 pub struct NameTagSprite(Entity);
 
@@ -17,7 +30,7 @@ pub fn spawn_name_tag_sprite(
 ) {
     if let Some(font) = fonts.get(assets.font_regular.clone()) {
         for (entity, name_tag) in query.iter() {
-            let text = font.render_text(&name_tag.0, Color::WHITE, 30., 100, 100);
+            let text = font.render_text(&name_tag.name, Color::WHITE, 30., 100, 100);
             let text_handle = textures.add(text);
 
             commands
@@ -28,6 +41,7 @@ pub fn spawn_name_tag_sprite(
                         size: Vec2::new(1.0, 1.0),
                         ..Default::default()
                     },
+                    // We don't bother setting the correct position, as it'll be set by the other system
                     transform: Transform::from_scale(Vec3::new(-0.03, 0.03, 0.03)),
                     ..Default::default()
                 })
@@ -39,22 +53,29 @@ pub fn spawn_name_tag_sprite(
 
 pub fn move_name_tag_and_rotate(
     mut name_tags: Query<(&mut Transform, &NameTagSprite)>,
-    tag_holders: Query<&Transform, With<NameTag>>,
+    tag_holders: Query<(&Transform, &NameTag)>,
     camera_query: Query<&GlobalTransform, With<CameraObject>>,
 ) {
     let camera_transform = camera_query.iter().next().unwrap();
 
     for (mut transform, tag) in name_tags.iter_mut() {
-        let holder = if let Ok(holder) = tag_holders.get(tag.0) {
-            holder.translation
+        // Get the entity associated to this NameTagSprite
+        let (holder_pos, name_tag) = if let Ok((holder, name_tag)) = tag_holders.get(tag.0) {
+            (holder.translation, name_tag)
         } else {
             continue;
         };
 
+        // Rotate and move NameTagSprite entity
         transform.look_at(camera_transform.translation, Vec3::unit_y());
-        transform.translation = Vec3::unit_y() + holder;
+        transform.translation = name_tag.margin * Vec3::unit_y() + holder_pos;
     }
 }
+
+// The following is old Bevy code, was deleted for some reason but
+// as far as I can tell works perfectly
+
+// Adds a `render_text` method that returns a Texture with the correct text
 
 use ab_glyph::{self, Glyph, Point, ScaleFont};
 use bevy::render::texture::{Extent3d, TextureDimension, TextureFormat};

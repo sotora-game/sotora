@@ -162,7 +162,7 @@ fn spawn_interactables(
             ..Default::default()
         })
         .with(BattleStarter)
-        .with(NameTag("Battle".to_string()))
+        .with(NameTag::new("Battle".to_string()))
         .with(StateCleanup);
 
     let ferris_handle = asset_server.load("sprites/ferris-happy.png");
@@ -173,7 +173,7 @@ fn spawn_interactables(
             transform: Transform::from_translation(Vec3::new(-5., 1.0, 5.)),
             ..Default::default()
         })
-        .with(NameTag("Ferris".to_string()))
+        .with(NameTag::new("Ferris".to_string()))
         .with(DialogStarter {
             npc_name: "Ferris".to_string(),
             sprite: c_materials.add(ferris_handle.into()),
