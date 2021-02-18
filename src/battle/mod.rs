@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use self::camera::Camera;
+use self::camera::{CameraObject, CameraRoot};
 
 use crate::hud_area_label::HudAreaLabel;
 use crate::AppState;
@@ -71,7 +71,7 @@ fn spawn_camera(commands: &mut Commands) -> Entity {
         .spawn(())
         .with(Transform::default())
         .with(GlobalTransform::default())
-        .with(Camera)
+        .with(CameraRoot)
         .current_entity()
         .unwrap();
 
@@ -80,6 +80,7 @@ fn spawn_camera(commands: &mut Commands) -> Entity {
             transform,
             ..Default::default()
         })
+        .with(CameraObject)
         .with(StateCleanup)
         .current_entity()
         .unwrap();
