@@ -1,8 +1,9 @@
 use bevy::app::AppExit;
 use bevy::prelude::*;
 
-use crate::menu::{button, MenuAssets};
+use crate::menu::button;
 use crate::AppState;
+use crate::UiAssets;
 
 /// Marker for despawning when exiting `AppState::MainMenu`
 pub struct StateCleanup;
@@ -25,7 +26,7 @@ pub fn button_open_settings_menu(In(clicked): In<bool>, mut state: ResMut<State<
     }
 }
 
-pub fn setup(commands: &mut Commands, assets: Res<MenuAssets>) {
+pub fn setup(commands: &mut Commands, assets: Res<UiAssets>) {
     let button_style = Style {
         size: Size::new(Val::Auto, Val::Auto),
         margin: Rect::all(Val::Px(5.0)),
