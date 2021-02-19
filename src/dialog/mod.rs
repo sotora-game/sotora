@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 
 use crate::AppState;
-use crate::UiAssets;
 use crate::Stage;
+use crate::UiAssets;
 
 /// Marker for despawning when exiting `AppState::Dialog`
 pub struct StateCleanup;
@@ -11,7 +11,11 @@ pub struct DialogPlugin;
 impl Plugin for DialogPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.on_state_enter(Stage::AppState, AppState::Dialog, setup_dialog.system())
-            .on_state_update(Stage::AppState, AppState::Dialog, back_to_overworld.system())
+            .on_state_update(
+                Stage::AppState,
+                AppState::Dialog,
+                back_to_overworld.system(),
+            )
             .on_state_exit(
                 Stage::AppState,
                 AppState::Dialog,

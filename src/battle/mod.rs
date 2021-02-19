@@ -16,8 +16,16 @@ impl Plugin for BattlePlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.on_state_enter(Stage::AppState, AppState::Battle, setup_battle.system())
             .on_state_enter(Stage::AppState, AppState::Battle, show_area_title.system())
-            .on_state_update(Stage::AppState, AppState::Battle, camera::rotate_camera.system())
-            .on_state_update(Stage::AppState, AppState::Battle, back_to_overworld.system())
+            .on_state_update(
+                Stage::AppState,
+                AppState::Battle,
+                camera::rotate_camera.system(),
+            )
+            .on_state_update(
+                Stage::AppState,
+                AppState::Battle,
+                back_to_overworld.system(),
+            )
             .on_state_exit(
                 Stage::AppState,
                 AppState::Battle,
