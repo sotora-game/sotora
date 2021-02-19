@@ -19,8 +19,10 @@ mod menu;
 mod overworld;
 mod user_config;
 
-/// Label for the AppState stage
-const APPSTATES: &str = "AppStates";
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, StageLabel)]
+pub enum  Stage {
+    AppState
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AppState {
@@ -94,7 +96,7 @@ fn main() {
         .add_system(update_hud_area_label.system())
         // AppState
         .insert_resource(State::new(AppState::MainMenu))
-        .add_stage_before(stage::UPDATE, APPSTATES, StateStage::<AppState>::default())
+        .add_stage_before(CoreStage::Update, Stage::AppState, StateStage::<AppState>::default())
         // State Plugins
         .add_plugin(MenuPlugin)
         .add_plugin(OverworldPlugin)

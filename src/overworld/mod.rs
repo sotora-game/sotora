@@ -8,7 +8,7 @@ use self::{
 
 use crate::hud_area_label::HudAreaLabel;
 use crate::AppState;
-use crate::APPSTATES;
+use crate::Stage;
 
 pub mod camera;
 pub mod interactables;
@@ -21,31 +21,31 @@ pub struct OverworldPlugin;
 
 impl Plugin for OverworldPlugin {
     fn build(&self, app: &mut AppBuilder) {
-        app.on_state_enter(APPSTATES, AppState::Overworld, setup_overworld.system())
-            .on_state_enter(APPSTATES, AppState::Overworld, show_area_title.system())
-            .on_state_update(APPSTATES, AppState::Overworld, player::move_player.system())
+        app.on_state_enter(Stage::AppState, AppState::Overworld, setup_overworld.system())
+            .on_state_enter(Stage::AppState, AppState::Overworld, show_area_title.system())
+            .on_state_update(Stage::AppState, AppState::Overworld, player::move_player.system())
             .on_state_update(
-                APPSTATES,
+                Stage::AppState,
                 AppState::Overworld,
                 camera::rotate_camera.system(),
             )
             .on_state_update(
-                APPSTATES,
+                Stage::AppState,
                 AppState::Overworld,
                 interactables::interactable_interact::<BattleStarter>
                     .system()
                     .chain(interactables::battle_starter::interactable_start_battle.system()),
             )
             .on_state_update(
-                APPSTATES,
+                Stage::AppState,
                 AppState::Overworld,
                 interactables::interactable_interact::<DialogStarter>
                     .system()
                     .chain(interactables::dialog_starter::interactable_start_dialog.system()),
             )
-            .on_state_update(APPSTATES, AppState::Overworld, back_to_menu.system())
+            .on_state_update(Stage::AppState, AppState::Overworld, back_to_menu.system())
             .on_state_exit(
-                APPSTATES,
+                Stage::AppState,
                 AppState::Overworld,
                 crate::despawn_all::<StateCleanup>.system(),
             );
