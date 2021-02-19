@@ -4,7 +4,7 @@ use self::camera::{CameraObject, CameraRoot};
 
 use crate::hud_area_label::HudAreaLabel;
 use crate::AppState;
-use crate::APPSTATES;
+use crate::Stage;
 
 pub mod camera;
 
@@ -14,12 +14,20 @@ pub struct StateCleanup;
 pub struct BattlePlugin;
 impl Plugin for BattlePlugin {
     fn build(&self, app: &mut AppBuilder) {
-        app.on_state_enter(APPSTATES, AppState::Battle, setup_battle.system())
-            .on_state_enter(APPSTATES, AppState::Battle, show_area_title.system())
-            .on_state_update(APPSTATES, AppState::Battle, camera::rotate_camera.system())
-            .on_state_update(APPSTATES, AppState::Battle, back_to_overworld.system())
+        app.on_state_enter(Stage::AppState, AppState::Battle, setup_battle.system())
+            .on_state_enter(Stage::AppState, AppState::Battle, show_area_title.system())
+            .on_state_update(
+                Stage::AppState,
+                AppState::Battle,
+                camera::rotate_camera.system(),
+            )
+            .on_state_update(
+                Stage::AppState,
+                AppState::Battle,
+                back_to_overworld.system(),
+            )
             .on_state_exit(
-                APPSTATES,
+                Stage::AppState,
                 AppState::Battle,
                 crate::despawn_all::<StateCleanup>.system(),
             );

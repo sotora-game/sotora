@@ -11,7 +11,7 @@ ab_glyph = "0.2.9"
 
 [dependencies.bevy]
 git = "https://github.com/bevyengine/bevy.git"
-rev = "f8292ccf7ef99b254e936329de9dd7e079760e55"
+rev = "c2a427f1a38db6b1d9798e631a7da7a8507fe18c"
 features = ["serialize"]
 
 [profile.dev]
