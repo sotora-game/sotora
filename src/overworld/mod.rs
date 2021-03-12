@@ -65,19 +65,19 @@ impl Plugin for OverworldPlugin {
 }
 
 fn setup_overworld(
-    commands: &mut Commands,
+    mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut s_materials: ResMut<Assets<StandardMaterial>>,
     mut c_materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    let player_entity = spawn_player(commands, &mut meshes, &mut s_materials);
-    let camera_entity = spawn_camera(commands);
+    let player_entity = spawn_player(&mut commands, &mut meshes, &mut s_materials);
+    let camera_entity = spawn_camera(&mut commands);
 
     commands.push_children(player_entity, &[camera_entity]);
 
     spawn_interactables(
-        commands,
+        &mut commands,
         &asset_server,
         &mut meshes,
         &mut s_materials,
@@ -122,7 +122,7 @@ fn spawn_player(
 
 fn spawn_camera(commands: &mut Commands) -> Entity {
     let mut transform = Transform::from_translation(Vec3::new(0., 15., -15.));
-    transform.look_at(Vec3::zero(), Vec3::unit_y());
+    transform.look_at(Vec3::ZERO, Vec3::Y);
 
     let root = commands
         .spawn(())

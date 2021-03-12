@@ -35,7 +35,7 @@ pub struct DialogResource {
     pub sprite: Handle<ColorMaterial>,
 }
 
-pub fn setup_dialog(commands: &mut Commands, assets: Res<UiAssets>, dialog: Res<DialogResource>) {
+pub fn setup_dialog(mut commands: Commands, assets: Res<UiAssets>, dialog: Res<DialogResource>) {
     commands
         // Container
         .spawn(NodeBundle {

@@ -8,7 +8,7 @@ use crate::UiAssets;
 /// Marker for despawning when exiting `AppState::MainMenu`
 pub struct StateCleanup;
 
-pub fn button_exit_app(In(clicked): In<bool>, mut app_exit: ResMut<Events<AppExit>>) {
+pub fn button_exit_app(In(clicked): In<bool>, mut app_exit: EventWriter<AppExit>) {
     if clicked {
         app_exit.send(AppExit);
     }
@@ -26,7 +26,7 @@ pub fn button_open_settings_menu(In(clicked): In<bool>, mut state: ResMut<State<
     }
 }
 
-pub fn setup(commands: &mut Commands, assets: Res<UiAssets>) {
+pub fn setup(mut commands: Commands, assets: Res<UiAssets>) {
     let button_style = Style {
         size: Size::new(Val::Auto, Val::Auto),
         margin: Rect::all(Val::Px(5.0)),

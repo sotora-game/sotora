@@ -1,7 +1,7 @@
 //! The HUD area label is a little decorative title that pops up at the top of
 //! the screen when the player enters a new area in the world.
 
-use std::f32::consts::PI;
+use std::{f32::consts::PI, time::Duration};
 
 use bevy::prelude::*;
 
@@ -36,10 +36,11 @@ pub struct HudAreaLabelAssets {
     font_bold: Handle<Font>,
 }
 
-impl FromResources for HudAreaLabelAssets {
-    fn from_resources(resources: &Resources) -> Self {
-        let mut materials = resources.get_mut::<Assets<ColorMaterial>>().unwrap();
-        let assets = resources.get_mut::<AssetServer>().unwrap();
+impl FromWorld for HudAreaLabelAssets {
+    fn from_world(world: &mut World) -> Self {
+        let world = world.cell();
+        let mut materials = world.get_resource_mut::<Assets<ColorMaterial>>().unwrap();
+        let assets = world.get_resource_mut::<AssetServer>().unwrap();
 
         HudAreaLabelAssets {
             hud_area_border_frames: [
@@ -86,7 +87,7 @@ impl Animation {
         }
     }
 
-    fn tick(mut self, delta_time: f32) -> Option<Self> {
+    fn tick(mut self, delta_time: Duration) -> Option<Self> {
         self.timer.tick(delta_time);
 
         if self.timer.just_finished() {
@@ -141,7 +142,7 @@ pub fn update_hud_area_label(
     mut text_query: Query<&mut Text, With<HudAreaLabelNode>>,
     mut images: Query<&mut Handle<ColorMaterial>, With<HudAreaLabelNode>>,
 ) {
-    let delta_time = time.delta_seconds();
+    let delta_time = time.delta();
 
     if let Some(new_text) = hud_label.new_label.take() {
         if let Some(mut text) = text_query.iter_mut().next() {
@@ -178,7 +179,7 @@ pub fn update_hud_area_label(
 }
 
 /// Sets up the components necessary for the HUD area label
-pub fn setup_hud_area_label(commands: &mut Commands, assets: Res<HudAreaLabelAssets>) {
+pub fn setup_hud_area_label(mut commands: Commands, assets: Res<HudAreaLabelAssets>) {
     commands
         // Root container at the top of the screen
         .spawn(NodeBundle {

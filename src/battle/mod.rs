@@ -35,12 +35,12 @@ impl Plugin for BattlePlugin {
 }
 
 fn setup_battle(
-    commands: &mut Commands,
+    mut commands: Commands,
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut asset_server: ResMut<AssetServer>,
 ) {
-    spawn_board(commands, &mut asset_server, &mut materials);
-    let _camera_entity = spawn_camera(commands);
+    spawn_board(&mut commands, &mut asset_server, &mut materials);
+    let _camera_entity = spawn_camera(&mut commands);
 
     commands
         .spawn(LightBundle {
@@ -73,7 +73,7 @@ fn spawn_board(
 
 fn spawn_camera(commands: &mut Commands) -> Entity {
     let mut transform = Transform::from_translation(Vec3::new(0., 15., -15.));
-    transform.look_at(Vec3::zero(), Vec3::unit_y());
+    transform.look_at(Vec3::ZERO, Vec3::Y);
 
     let root = commands
         .spawn(())

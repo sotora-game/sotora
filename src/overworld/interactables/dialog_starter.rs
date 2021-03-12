@@ -11,7 +11,7 @@ pub struct DialogStarter {
 
 pub fn interactable_start_dialog(
     In(interactable): In<Option<DialogStarter>>,
-    commands: &mut Commands,
+    mut commands: Commands,
     mut state: ResMut<State<AppState>>,
 ) {
     if let Some(dialog) = interactable {
