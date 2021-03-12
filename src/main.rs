@@ -1,6 +1,9 @@
-use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
-use bevy::prelude::*;
 use bevy::render::camera::{ActiveCameras, Camera};
+use bevy::{
+    diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin},
+    ecs::component::Component,
+};
+use bevy::{ecs::schedule::ReportExecutionOrderAmbiguities, prelude::*};
 
 use battle::BattlePlugin;
 use dialog::DialogPlugin;
@@ -43,7 +46,7 @@ pub enum AppState {
 ///
 /// This is a workaround for [Bevy issue #1452](https://github.com/bevyengine/bevy/issues/1452).
 fn despawn_all<T: Component>(
-    cmd: &mut Commands,
+    mut cmd: Commands,
     query: Query<Entity, With<T>>,
     mut cameras: ResMut<ActiveCameras>,
     camera_query: Query<&Camera, With<T>>,
@@ -109,7 +112,7 @@ fn main() {
         .run();
 }
 
-fn global_setup(commands: &mut Commands) {
+fn global_setup(mut commands: Commands) {
     commands.spawn(UiCameraBundle::default());
 }
 
@@ -127,15 +130,18 @@ pub struct UiAssets {
     font_light: Handle<Font>,
     font_light_italic: Handle<Font>,
     font_regular: Handle<Font>,
+    #[allow(unused)]
     font_regular_italic: Handle<Font>,
     font_bold: Handle<Font>,
+    #[allow(unused)]
     font_bold_italic: Handle<Font>,
 }
 
-impl FromResources for UiAssets {
-    fn from_resources(resources: &Resources) -> Self {
-        let mut materials = resources.get_mut::<Assets<ColorMaterial>>().unwrap();
-        let assets = resources.get_mut::<AssetServer>().unwrap();
+impl FromWorld for UiAssets {
+    fn from_world(world: &mut World) -> Self {
+        let world = world.cell();
+        let mut materials = world.get_resource_mut::<Assets<ColorMaterial>>().unwrap();
+        let assets = world.get_resource_mut::<AssetServer>().unwrap();
 
         UiAssets {
             button_normal: materials.add(Color::rgb(0.3, 0.3, 0.36).into()),

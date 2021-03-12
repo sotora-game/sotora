@@ -13,8 +13,8 @@ pub fn move_player(
     time: Res<Time>,
 ) {
     for (mut transform, player) in query.iter_mut() {
-        let forward = transform.forward();
-        let left = forward.cross(Vec3::unit_y());
+        let forward = transform.local_z();
+        let left = forward.cross(Vec3::Y);
         let delta = time.delta_seconds() * player.speed;
 
         if input.pressed(keybinds.move_forward) {

@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{ecs::component::Component, prelude::*};
 
 use crate::overworld::player::Player;
 use crate::user_config::KeyBinds;

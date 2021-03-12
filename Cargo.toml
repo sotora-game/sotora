@@ -10,7 +10,7 @@ ron = "0.6"
 
 [dependencies.bevy]
 git = "https://github.com/bevyengine/bevy.git"
-rev = "c2a427f1a38db6b1d9798e631a7da7a8507fe18c"
+rev = "8a9f475edb51ea45c976c000113ca55bac751f96"
 features = ["serialize"]
 
 [profile.dev]
