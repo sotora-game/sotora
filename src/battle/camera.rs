@@ -1,5 +1,6 @@
 use bevy::{input::mouse::MouseMotion, prelude::*};
 
+#[derive(Component)]
 pub struct Camera;
 
 pub fn rotate_camera(

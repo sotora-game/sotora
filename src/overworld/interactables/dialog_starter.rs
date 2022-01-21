@@ -3,10 +3,10 @@ use bevy::prelude::*;
 use crate::dialog::DialogResource;
 use crate::AppState;
 
-#[derive(Clone)]
+#[derive(Component, Clone)]
 pub struct DialogStarter {
     pub npc_name: String,
-    pub sprite: Handle<ColorMaterial>,
+    pub sprite: Handle<Image>,
 }
 
 pub fn interactable_start_dialog(
@@ -20,6 +20,6 @@ pub fn interactable_start_dialog(
             sprite: dialog.sprite,
         });
 
-        state.set_next(AppState::Dialog).unwrap();
+        state.set(AppState::Dialog).unwrap();
     }
 }

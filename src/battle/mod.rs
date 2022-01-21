@@ -4,33 +4,29 @@ use self::camera::Camera;
 
 use crate::hud_area_label::HudAreaLabel;
 use crate::AppState;
-use crate::Stage;
 
 pub mod camera;
 
 /// Marker for despawning when exiting `AppState::Battle`
+#[derive(Component)]
 pub struct StateCleanup;
 
 pub struct BattlePlugin;
 impl Plugin for BattlePlugin {
-    fn build(&self, app: &mut AppBuilder) {
-        app.on_state_enter(Stage::AppState, AppState::Battle, setup_battle.system())
-            .on_state_enter(Stage::AppState, AppState::Battle, show_area_title.system())
-            .on_state_update(
-                Stage::AppState,
-                AppState::Battle,
-                camera::rotate_camera.system(),
-            )
-            .on_state_update(
-                Stage::AppState,
-                AppState::Battle,
-                back_to_overworld.system(),
-            )
-            .on_state_exit(
-                Stage::AppState,
-                AppState::Battle,
-                crate::despawn_all::<StateCleanup>.system(),
-            );
+    fn build(&self, app: &mut App) {
+        app.add_system_set(
+            SystemSet::on_enter(AppState::Battle)
+                .with_system(setup_battle)
+                .with_system(show_area_title),
+        )
+        .add_system_set(
+            SystemSet::on_update(AppState::Battle)
+                .with_system(camera::rotate_camera)
+                .with_system(back_to_overworld),
+        )
+        .add_system_set(
+            SystemSet::on_exit(AppState::Battle).with_system(crate::despawn_all::<StateCleanup>),
+        );
     }
 }
 
@@ -43,15 +39,15 @@ fn setup_battle(
     let _camera_entity = spawn_camera(&mut commands);
 
     commands
-        .spawn(LightBundle {
+        .spawn_bundle(PointLightBundle {
             transform: Transform::from_xyz(5.0, 10.0, 5.0),
-            light: Light {
+            point_light: PointLight {
                 color: Color::rgb(0.5, 0.5, 0.5),
                 ..Default::default()
             },
             ..Default::default()
         })
-        .with(StateCleanup);
+        .insert(StateCleanup);
 }
 
 fn spawn_board(
@@ -62,13 +58,13 @@ fn spawn_board(
     let mesh = asset_server.load("meshes/hex.gltf#Mesh0/Primitive0");
 
     commands
-        .spawn(PbrBundle {
+        .spawn_bundle(PbrBundle {
             mesh,
             transform: Transform::from_scale(Vec3::splat(0.8)), // More magic numbers
             material: materials.add(Color::WHITE.into()),
             ..Default::default()
         })
-        .with(StateCleanup);
+        .insert(StateCleanup);
 }
 
 fn spawn_camera(commands: &mut Commands) -> Entity {
@@ -76,23 +72,21 @@ fn spawn_camera(commands: &mut Commands) -> Entity {
     transform.look_at(Vec3::ZERO, Vec3::Y);
 
     let root = commands
-        .spawn(())
-        .with(Transform::default())
-        .with(GlobalTransform::default())
-        .with(Camera)
-        .current_entity()
-        .unwrap();
+        .spawn()
+        .insert(Transform::default())
+        .insert(GlobalTransform::default())
+        .insert(Camera)
+        .id();
 
     let camera = commands
-        .spawn(PerspectiveCameraBundle {
+        .spawn_bundle(PerspectiveCameraBundle {
             transform,
             ..Default::default()
         })
-        .with(StateCleanup)
-        .current_entity()
-        .unwrap();
+        .insert(StateCleanup)
+        .id();
 
-    commands.push_children(root, &[camera]);
+    commands.entity(root).push_children(&[camera]);
 
     root
 }
@@ -103,6 +97,6 @@ fn show_area_title(mut hud: ResMut<HudAreaLabel>) {
 
 fn back_to_overworld(mut state: ResMut<State<AppState>>, input: Res<Input<KeyCode>>) {
     if input.just_pressed(KeyCode::Escape) {
-        state.set_next(AppState::Overworld).unwrap();
+        state.set(AppState::Overworld).unwrap();
     }
 }

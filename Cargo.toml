@@ -1,16 +1,16 @@
 [package]
 name = "sotora"
 version = "0.1.0"
-edition = "2018"
+edition = "2021"
 
 [dependencies]
-directories = "3.0"
+directories = "4.0"
 serde = { version = "1.0", features = ["derive"] }
-ron = "0.6"
+ron = "0.7"
 
 [dependencies.bevy]
 git = "https://github.com/bevyengine/bevy.git"
-rev = "8a9f475edb51ea45c976c000113ca55bac751f96"
+rev = "f3de12bc5e03c58a9b863943b8db84a321422bec"
 features = ["serialize"]
 
 [profile.dev]

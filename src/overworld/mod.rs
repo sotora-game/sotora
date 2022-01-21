@@ -8,58 +8,40 @@ use self::{
 
 use crate::hud_area_label::HudAreaLabel;
 use crate::AppState;
-use crate::Stage;
 
 pub mod camera;
 pub mod interactables;
 pub mod player;
 
 /// Marker for despawning when exiting `AppState::Overworld`
+#[derive(Component)]
 pub struct StateCleanup;
 
 pub struct OverworldPlugin;
 
 impl Plugin for OverworldPlugin {
-    fn build(&self, app: &mut AppBuilder) {
-        app.on_state_enter(
-            Stage::AppState,
-            AppState::Overworld,
-            setup_overworld.system(),
+    fn build(&self, app: &mut App) {
+        app.add_system_set(
+            SystemSet::on_enter(AppState::Overworld)
+                .with_system(setup_overworld)
+                .with_system(show_area_title),
         )
-        .on_state_enter(
-            Stage::AppState,
-            AppState::Overworld,
-            show_area_title.system(),
+        .add_system_set(
+            SystemSet::on_update(AppState::Overworld)
+                .with_system(player::move_player)
+                .with_system(camera::rotate_camera)
+                .with_system(
+                    interactables::interactable_interact::<BattleStarter>
+                        .chain(interactables::battle_starter::interactable_start_battle),
+                )
+                .with_system(
+                    interactables::interactable_interact::<DialogStarter>
+                        .chain(interactables::dialog_starter::interactable_start_dialog),
+                )
+                .with_system(back_to_menu),
         )
-        .on_state_update(
-            Stage::AppState,
-            AppState::Overworld,
-            player::move_player.system(),
-        )
-        .on_state_update(
-            Stage::AppState,
-            AppState::Overworld,
-            camera::rotate_camera.system(),
-        )
-        .on_state_update(
-            Stage::AppState,
-            AppState::Overworld,
-            interactables::interactable_interact::<BattleStarter>
-                .system()
-                .chain(interactables::battle_starter::interactable_start_battle.system()),
-        )
-        .on_state_update(
-            Stage::AppState,
-            AppState::Overworld,
-            interactables::interactable_interact::<DialogStarter>
-                .system()
-                .chain(interactables::dialog_starter::interactable_start_dialog.system()),
-        )
-        .on_state_update(Stage::AppState, AppState::Overworld, back_to_menu.system())
-        .on_state_exit(
-            Stage::AppState,
-            AppState::Overworld,
-            crate::despawn_all::<StateCleanup>.system(),
+        .add_system_set(
+            SystemSet::on_exit(AppState::Overworld).with_system(crate::despawn_all::<StateCleanup>),
         );
     }
 }
@@ -69,31 +51,31 @@ fn setup_overworld(
     asset_server: Res<AssetServer>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut s_materials: ResMut<Assets<StandardMaterial>>,
-    mut c_materials: ResMut<Assets<ColorMaterial>>,
 ) {
     let player_entity = spawn_player(&mut commands, &mut meshes, &mut s_materials);
     let camera_entity = spawn_camera(&mut commands);
 
-    commands.push_children(player_entity, &[camera_entity]);
+    commands
+        .entity(player_entity)
+        .insert_children(0, &[camera_entity]);
 
     spawn_interactables(
         &mut commands,
         &asset_server,
         &mut meshes,
         &mut s_materials,
-        &mut c_materials,
     );
 
     commands
-        .spawn(LightBundle {
+        .spawn_bundle(PointLightBundle {
             transform: Transform::from_xyz(5.0, 10.0, 5.0),
-            light: Light {
+            point_light: PointLight {
                 color: Color::rgb(0.5, 0.5, 0.5),
                 ..Default::default()
             },
             ..Default::default()
         })
-        .with(StateCleanup);
+        .insert(StateCleanup);
 }
 
 fn spawn_player(
@@ -102,22 +84,23 @@ fn spawn_player(
     materials: &mut Assets<StandardMaterial>,
 ) -> Entity {
     commands
-        .spawn(PbrBundle {
+        .spawn_bundle(PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Plane { size: 20.0 })),
             material: materials.add(Color::rgb(0.1, 0.8, 0.2).into()),
             ..Default::default()
         })
-        .with(StateCleanup)
-        .spawn(PbrBundle {
+        .insert(StateCleanup);
+
+    commands
+        .spawn_bundle(PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Box::new(1., 2., 1.))),
             material: materials.add(Color::WHITE.into()),
             transform: Transform::from_translation(Vec3::new(0., 1.0, 0.)),
             ..Default::default()
         })
-        .with(StateCleanup)
-        .with(Player { speed: 10. })
-        .current_entity()
-        .unwrap()
+        .insert(StateCleanup)
+        .insert(Player { speed: 10. })
+        .id()
 }
 
 fn spawn_camera(commands: &mut Commands) -> Entity {
@@ -125,23 +108,21 @@ fn spawn_camera(commands: &mut Commands) -> Entity {
     transform.look_at(Vec3::ZERO, Vec3::Y);
 
     let root = commands
-        .spawn(())
-        .with(Transform::default())
-        .with(GlobalTransform::default())
-        .with(Camera)
-        .current_entity()
-        .unwrap();
+        .spawn()
+        .insert(Transform::default())
+        .insert(GlobalTransform::default())
+        .insert(Camera)
+        .id();
 
     let camera = commands
-        .spawn(PerspectiveCameraBundle {
+        .spawn_bundle(PerspectiveCameraBundle {
             transform,
             ..Default::default()
         })
-        .with(StateCleanup)
-        .current_entity()
-        .unwrap();
+        .insert(StateCleanup)
+        .id();
 
-    commands.push_children(root, &[camera]);
+    commands.entity(root).insert_children(0, &[camera]);
 
     root
 }
@@ -150,32 +131,31 @@ fn spawn_interactables(
     commands: &mut Commands,
     asset_server: &AssetServer,
     meshes: &mut Assets<Mesh>,
-    s_materials: &mut Assets<StandardMaterial>,
-    c_materials: &mut Assets<ColorMaterial>,
+    s_materials: &mut Assets<StandardMaterial>
 ) {
     commands
-        .spawn(PbrBundle {
+        .spawn_bundle(PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Box::new(1., 1., 1.))),
             material: s_materials.add(Color::GREEN.into()),
             transform: Transform::from_translation(Vec3::new(5., 1.0, 5.)),
             ..Default::default()
         })
-        .with(BattleStarter)
-        .with(StateCleanup);
+        .insert(BattleStarter)
+        .insert(StateCleanup);
 
     let ferris_handle = asset_server.load("sprites/ferris-happy.png");
     commands
-        .spawn(PbrBundle {
+        .spawn_bundle(PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Box::new(1., 2., 1.))),
             material: s_materials.add(Color::RED.into()),
             transform: Transform::from_translation(Vec3::new(-5., 1.0, 5.)),
             ..Default::default()
         })
-        .with(DialogStarter {
+        .insert(DialogStarter {
             npc_name: "Ferris".to_string(),
-            sprite: c_materials.add(ferris_handle.into()),
+            sprite: ferris_handle.into(),
         })
-        .with(StateCleanup);
+        .insert(StateCleanup);
 }
 
 fn show_area_title(mut hud: ResMut<HudAreaLabel>) {
@@ -184,6 +164,6 @@ fn show_area_title(mut hud: ResMut<HudAreaLabel>) {
 
 pub fn back_to_menu(mut state: ResMut<State<AppState>>, input: Res<Input<KeyCode>>) {
     if input.just_pressed(KeyCode::Escape) {
-        state.set_next(AppState::MainMenu).unwrap();
+        state.set(AppState::MainMenu).unwrap();
     }
 }

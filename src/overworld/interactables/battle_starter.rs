@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use crate::AppState;
 
-#[derive(Clone)]
+#[derive(Component, Clone)]
 pub struct BattleStarter;
 
 pub fn interactable_start_battle(
@@ -10,6 +10,6 @@ pub fn interactable_start_battle(
     mut state: ResMut<State<AppState>>,
 ) {
     if interactable.is_some() {
-        state.set_next(AppState::Battle).unwrap();
+        state.set(AppState::Battle).unwrap();
     }
 }
