@@ -31,32 +31,31 @@ const TITLE_ANIMATION_TIME: f32 = 0.8;
 
 /// Loads the assets required for the HUD area label
 pub struct HudAreaLabelAssets {
-    hud_area_border_frames: [Handle<ColorMaterial>; BORDER_ANIMATION_FRAMES],
-    transparent: Handle<ColorMaterial>,
+    hud_area_border_frames: [Handle<Image>; BORDER_ANIMATION_FRAMES],
+    transparent: UiColor,
     font_bold: Handle<Font>,
 }
 
 impl FromWorld for HudAreaLabelAssets {
     fn from_world(world: &mut World) -> Self {
         let world = world.cell();
-        let mut materials = world.get_resource_mut::<Assets<ColorMaterial>>().unwrap();
         let assets = world.get_resource_mut::<AssetServer>().unwrap();
 
         HudAreaLabelAssets {
             hud_area_border_frames: [
-                materials.add(assets.load("ui/hud_area_title_border/1.png").into()),
-                materials.add(assets.load("ui/hud_area_title_border/2.png").into()),
-                materials.add(assets.load("ui/hud_area_title_border/3.png").into()),
-                materials.add(assets.load("ui/hud_area_title_border/4.png").into()),
-                materials.add(assets.load("ui/hud_area_title_border/5.png").into()),
-                materials.add(assets.load("ui/hud_area_title_border/6.png").into()),
-                materials.add(assets.load("ui/hud_area_title_border/7.png").into()),
-                materials.add(assets.load("ui/hud_area_title_border/8.png").into()),
-                materials.add(assets.load("ui/hud_area_title_border/9.png").into()),
-                materials.add(assets.load("ui/hud_area_title_border/10.png").into()),
+                assets.load("ui/hud_area_title_border/1.png").into(),
+                assets.load("ui/hud_area_title_border/2.png").into(),
+                assets.load("ui/hud_area_title_border/3.png").into(),
+                assets.load("ui/hud_area_title_border/4.png").into(),
+                assets.load("ui/hud_area_title_border/5.png").into(),
+                assets.load("ui/hud_area_title_border/6.png").into(),
+                assets.load("ui/hud_area_title_border/7.png").into(),
+                assets.load("ui/hud_area_title_border/8.png").into(),
+                assets.load("ui/hud_area_title_border/9.png").into(),
+                assets.load("ui/hud_area_title_border/10.png").into(),
             ],
 
-            transparent: materials.add(Color::NONE.into()),
+            transparent: Color::NONE.into(),
 
             font_bold: assets.load("fonts/sansation/Sansation-Bold.ttf"),
         }
@@ -132,6 +131,7 @@ impl HudAreaLabel {
 }
 
 /// Used to identify UI nodes belonging to the HUD area label
+#[derive(Component)]
 pub struct HudAreaLabelNode;
 
 /// Updates the HUD area label system
@@ -140,7 +140,7 @@ pub fn update_hud_area_label(
     assets: Res<HudAreaLabelAssets>,
     mut hud_label: ResMut<HudAreaLabel>,
     mut text_query: Query<&mut Text, With<HudAreaLabelNode>>,
-    mut images: Query<&mut Handle<ColorMaterial>, With<HudAreaLabelNode>>,
+    mut images: Query<&mut Handle<Image>, With<HudAreaLabelNode>>,
 ) {
     let delta_time = time.delta();
 
@@ -182,7 +182,7 @@ pub fn update_hud_area_label(
 pub fn setup_hud_area_label(mut commands: Commands, assets: Res<HudAreaLabelAssets>) {
     commands
         // Root container at the top of the screen
-        .spawn(NodeBundle {
+        .spawn_bundle(NodeBundle {
             style: Style {
                 position_type: PositionType::Absolute,
                 position: Rect {
@@ -199,22 +199,23 @@ pub fn setup_hud_area_label(mut commands: Commands, assets: Res<HudAreaLabelAsse
                 align_items: AlignItems::Center,
                 ..Default::default()
             },
-            material: assets.transparent.clone(),
+            color: assets.transparent,
             ..Default::default()
         })
         .with_children(|root| {
             // Left side decorative image
-            root.spawn(ImageBundle {
+            root.spawn_bundle(ImageBundle {
                 style: Style {
                     size: Size::new(Val::Px(BORDER_WIDTH), Val::Px(BORDER_HEIGHT)),
                     ..Default::default()
                 },
-                material: assets.hud_area_border_frames[0].clone(),
+                image: assets.hud_area_border_frames[0].clone().into(),
                 ..Default::default()
             })
-            .with(HudAreaLabelNode)
+            .insert(HudAreaLabelNode);
+
             // Text container with padding
-            .spawn(NodeBundle {
+            root.spawn_bundle(NodeBundle {
                 style: Style {
                     padding: Rect {
                         top: Val::Px(0.0),
@@ -224,12 +225,12 @@ pub fn setup_hud_area_label(mut commands: Commands, assets: Res<HudAreaLabelAsse
                     },
                     ..Default::default()
                 },
-                material: assets.transparent.clone(),
+                color: assets.transparent,
                 ..Default::default()
             })
             .with_children(|text_container| {
                 text_container
-                    .spawn(TextBundle {
+                    .spawn_bundle(TextBundle {
                         text: Text::with_section(
                             "",
                             TextStyle {
@@ -241,21 +242,22 @@ pub fn setup_hud_area_label(mut commands: Commands, assets: Res<HudAreaLabelAsse
                         ),
                         ..Default::default()
                     })
-                    .with(HudAreaLabelNode);
-            })
+                    .insert(HudAreaLabelNode);
+            });
+
             // Right side decorative image
-            .spawn(ImageBundle {
+            root.spawn_bundle(ImageBundle {
                 style: Style {
                     size: Size::new(Val::Px(BORDER_WIDTH), Val::Px(BORDER_HEIGHT)),
                     ..Default::default()
                 },
-                material: assets.hud_area_border_frames[0].clone(),
+                image: assets.hud_area_border_frames[0].clone().into(),
                 transform: Transform {
                     rotation: Quat::from_rotation_z(PI),
                     ..Default::default()
                 },
                 ..Default::default()
             })
-            .with(HudAreaLabelNode);
+            .insert(HudAreaLabelNode);
         });
 }

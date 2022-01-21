@@ -2,6 +2,7 @@ use bevy::prelude::*;
 
 use crate::user_config::KeyBinds;
 
+#[derive(Component)]
 pub struct Player {
     pub speed: f32,
 }
